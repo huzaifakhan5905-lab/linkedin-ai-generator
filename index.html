@@ -606,26 +606,58 @@
   </div>
 </section>
 
-<!-- ══ SUPPORT SECTION ═══════════════════════════════ -->
+<!-- ══ SUPPORT & MONETIZATION (2 SEPARATE CARDS) ════════ -->
 <section class="support-section" id="support">
   <div class="container">
-    <div class="support-card">
-      <h2>💖 100% Free Forever</h2>
-      <p>PostCraft AI is completely free without limits or ads. If this tool saves you time or helps your career, feel free to support via UPI / WhatsApp!</p>
-      <div class="support-links">
-        <div class="upi-box">
-          <span class="upi-lbl">UPI ID</span>
-          <strong class="upi-val" id="upiValText">7058227634@superyes</strong>
-          <button class="btn-copy-upi" onclick="copyText('upiValText')">📋 Copy</button>
+    <div class="support-grid">
+
+      <!-- CARD 1: UPI & QR BARCODE -->
+      <div class="support-card-box">
+        <div class="support-card-head">
+          <span class="support-icon">☕</span>
+          <div>
+            <h3>Support PostCraft AI</h3>
+            <p>100% Free forever. Scan QR or copy UPI ID to support!</p>
+          </div>
         </div>
-        <a href="https://wa.me/919860663661?text=Hi!%20I%20love%20PostCraft%20AI" target="_blank" rel="noopener" class="btn-wa">
-          <span>💬 WhatsApp Support:</span>
-          <strong>9860663661</strong>
-        </a>
+
+        <div class="qr-container">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=7058227634@superyes&pn=PostCraft%20AI" alt="UPI QR Code" class="qr-img" />
+          <div class="qr-details">
+            <span class="qr-label">Scan via GPay, PhonePe, Paytm or UPI</span>
+            <div class="upi-id-pill">
+              <span class="upi-id-text" id="upiValText">7058227634@superyes</span>
+              <button class="btn-copy-upi" onclick="copyText('upiValText')">📋 Copy</button>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <!-- CARD 2: WHATSAPP DIRECT SUPPORT -->
+      <div class="support-card-box support-card-box--wa">
+        <div class="support-card-head">
+          <span class="support-icon">💬</span>
+          <div>
+            <h3>WhatsApp Direct Support</h3>
+            <p>Have questions, custom feature requests, or feedback?</p>
+          </div>
+        </div>
+
+        <div class="wa-container">
+          <div class="wa-info">
+            <span class="wa-status"><span class="pulse-dot-green"></span> Creator Online</span>
+            <strong class="wa-num">9860663661</strong>
+          </div>
+          <a href="https://wa.me/919860663661?text=Hi!%20I%20am%20using%20PostCraft%20AI" target="_blank" rel="noopener" class="btn-wa-action">
+            <span>💬 Chat on WhatsApp</span> ➔
+          </a>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
+
 
 
 

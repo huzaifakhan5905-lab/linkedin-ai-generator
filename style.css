@@ -622,57 +622,119 @@ body {
 }
 
 
-/* ══ SUPPORT SECTION ═══════════════════════════════ */
-.support-section { padding: 60px 0 20px; }
-.support-card {
-  background: linear-gradient(135deg, rgba(13,15,26,0.98), rgba(22,26,45,0.98));
-  border: 1px solid rgba(10,132,255,0.25);
+/* ══ SUPPORT / MONETIZATION 2-CARD GRID ═══════════ */
+.support-section { padding: 60px 0 30px; }
+.support-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+}
+@media(max-width: 840px) {
+  .support-grid { grid-template-columns: 1fr; gap: 16px; }
+}
+
+.support-card-box {
+  background: linear-gradient(145deg, rgba(13,15,26,0.98), rgba(22,26,45,0.98));
+  border: 1px solid rgba(10, 132, 255, 0.25);
   border-radius: var(--r-xl);
-  padding: 36px 40px;
-  display: flex; flex-direction: column; align-items: center; text-align: center;
-  gap: 14px;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.45);
+  padding: 26px 24px;
+  display: flex; flex-direction: column; justify-content: space-between; gap: 20px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.4);
   position: relative; overflow: hidden;
+  transition: transform .2s var(--ease), border-color .2s var(--ease);
 }
-.support-card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, var(--blue), var(--purple), #25D366);
+.support-card-box:hover {
+  transform: translateY(-3px); border-color: var(--blue);
 }
-.support-card h2 { font-family: 'Syne', sans-serif; font-size: 1.65rem; font-weight: 800; color: var(--t1); margin-bottom: 2px; }
-.support-card p { color: var(--t2); font-size: .92rem; line-height: 1.6; max-width: 580px; }
 
-.support-links {
-  display: flex; align-items: center; justify-content: center; gap: 16px;
-  flex-wrap: wrap; margin-top: 10px; width: 100%;
+.support-card-box--wa {
+  border-color: rgba(37, 211, 102, 0.3);
 }
-.upi-box {
-  display: inline-flex; align-items: center; gap: 10px;
-  background: rgba(10,132,255,0.08); border: 1px solid rgba(10,132,255,0.3);
-  padding: 10px 20px; border-radius: var(--r-full);
+.support-card-box--wa:hover {
+  border-color: #25D366;
 }
-.upi-lbl { font-size: .78rem; font-weight: 700; color: var(--t2); text-transform: uppercase; letter-spacing: .06em; }
-.upi-val { font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 700; color: #60AAFF; letter-spacing: .02em; }
+
+.support-card-head {
+  display: flex; align-items: flex-start; gap: 14px;
+}
+.support-icon {
+  font-size: 1.8rem; background: rgba(255,255,255,0.05);
+  padding: 8px 12px; border-radius: var(--r-md); border: 1px solid var(--border); flex-shrink: 0;
+}
+.support-card-head h3 {
+  font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 800; color: var(--t1); margin-bottom: 4px;
+}
+.support-card-head p {
+  font-size: .84rem; color: var(--t2); line-height: 1.5;
+}
+
+/* QR CONTAINER */
+.qr-container {
+  display: flex; align-items: center; gap: 16px;
+  background: rgba(8,9,15,0.6); padding: 14px; border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+}
+.qr-img {
+  width: 110px; height: 110px; border-radius: var(--r-md);
+  background: #fff; padding: 6px; flex-shrink: 0; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+.qr-details {
+  display: flex; flex-direction: column; gap: 10px; flex: 1; min-width: 0;
+}
+.qr-label {
+  font-size: .76rem; color: var(--t2); font-weight: 500;
+}
+.upi-id-pill {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  background: var(--s2); border: 1px solid rgba(10,132,255,0.3);
+  padding: 6px 12px; border-radius: var(--r-full); width: 100%;
+}
+.upi-id-text {
+  font-size: .8rem; font-weight: 700; color: #60AAFF; font-family: 'DM Sans', sans-serif;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 .btn-copy-upi {
-  background: rgba(10,132,255,.25); color: #fff; border: 1px solid rgba(10,132,255,0.4);
-  padding: 4px 12px; border-radius: var(--r-full); font-size: .75rem;
-  font-weight: 700; cursor: pointer; transition: all .18s var(--ease); margin-left: 4px;
+  background: rgba(10,132,255,0.25); color: #fff; border: none;
+  padding: 4px 10px; border-radius: var(--r-full); font-size: .72rem;
+  font-weight: 700; cursor: pointer; flex-shrink: 0; transition: background .15s;
 }
-.btn-copy-upi:hover { background: var(--blue); color: #fff; }
+.btn-copy-upi:hover { background: var(--blue); }
 
-.btn-wa {
-  display: inline-flex; align-items: center; gap: 8px;
+/* WHATSAPP CONTAINER */
+.wa-container {
+  display: flex; flex-direction: column; gap: 16px;
+  background: rgba(37, 211, 102, 0.05); padding: 18px; border-radius: var(--r-lg);
+  border: 1px solid rgba(37, 211, 102, 0.2);
+}
+.wa-info {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.wa-status {
+  font-size: .76rem; color: #25D366; font-weight: 700;
+  display: flex; align-items: center; gap: 6px;
+}
+.pulse-dot-green {
+  width: 7px; height: 7px; border-radius: 50%; background: #25D366;
+  animation: blink 1.8s ease infinite;
+}
+.wa-num {
+  font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800; color: var(--t1);
+}
+.btn-wa-action {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
   background: linear-gradient(135deg, #25D366, #128C7E);
-  color: #fff; text-decoration: none; padding: 10px 22px;
-  border-radius: var(--r-full); font-size: .9rem; font-weight: 700;
-  box-shadow: 0 4px 20px rgba(37,211,102,.35); transition: all .18s var(--ease);
+  color: #fff !important; text-decoration: none; padding: 12px 20px;
+  border-radius: var(--r-lg); font-size: .9rem; font-weight: 700;
+  box-shadow: 0 6px 20px rgba(37,211,102,0.35); transition: all .18s var(--ease);
 }
-.btn-wa:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(37,211,102,.55); }
-.btn-wa span { font-weight: 500; opacity: .9; }
+.btn-wa-action:hover {
+  transform: translateY(-2px); box-shadow: 0 10px 28px rgba(37,211,102,0.5);
+}
 
-@media(max-width:680px) {
-  .support-links { flex-direction: column; width: 100%; }
-  .upi-box, .btn-wa { width: 100%; justify-content: center; }
+@media(max-width:540px) {
+  .qr-container { flex-direction: column; text-align: center; }
+  .qr-details { width: 100%; }
+  .upi-id-pill { justify-content: center; }
 }
+
 
 
 .footer { border-top: 1px solid var(--border); padding: 44px 0 28px; }
