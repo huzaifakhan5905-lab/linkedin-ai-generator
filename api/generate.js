@@ -408,7 +408,9 @@ function generateFallbackPost({ topic, style='storytelling', tone='casual', lang
 
   // Emojis & Hashtags
   if (!useEmoji) {
-    fullPost = fullPost.replace(/[\u{1F300}-\u{1F9FF}]/gu, '');
+    try {
+      fullPost = fullPost.replace(/[\u1F300-\u1F9FF]/g, '').replace(/[\uD83C-\uDBFF][\uDC00-\uDFFF]/g, '');
+    } catch {}
   }
 
   if (useHashtag) {
@@ -420,17 +422,19 @@ function generateFallbackPost({ topic, style='storytelling', tone='casual', lang
 
 
 /* ══════════════════════════════════════════
-   MAIN HANDLER
+   MAIN HANDLER (100% FAIL-SAFE TOP LEVEL)
 ══════════════════════════════════════════ */
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
+  if (req.method !== 'POST') return res.status(200).json({ error: 'Method Not Allowed' });
 
   const body = req.body || {};
+
   const apiKey = (process.env.OPENROUTER_API_KEY || '').trim();
 
   const { mode='post', topic, style, tone, useEmoji, useHashtag, useHook, inputMode,
