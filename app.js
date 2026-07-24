@@ -1098,8 +1098,6 @@ function renderResult(post) {
   preview.oninput = () => {
     S.post = preview.innerText;
     updateCharCount(S.post.length);
-    const shareBtn = document.getElementById('liShareBtn');
-    if (shareBtn) shareBtn.href = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(S.post)}`;
   };
 
   document.getElementById('reactions').textContent = rnd(80,450);
@@ -1107,12 +1105,32 @@ function renderResult(post) {
 
   updateCharCount(post.length);
 
-  const shareBtn = document.getElementById('liShareBtn');
-  if (shareBtn) shareBtn.href = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(post)}`;
-
   setTimeout(()=>calcScores(post), 280);
   result.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
+
+/* ── SMART LINKEDIN SHARE (MOBILE + DESKTOP) ── */
+async function shareOnLinkedIn() {
+  if (!S.post) {
+    toast('⚠️ No post generated to share','err');
+    return;
+  }
+
+  // 1. Always copy text to clipboard first
+  try {
+    await navigator.clipboard.writeText(S.post);
+    toast('📋 Post copied! Opening LinkedIn (long-press & paste)','ok');
+  } catch(e) {
+    console.warn('Clipboard write failed:', e);
+  }
+
+  // 2. Open LinkedIn share endpoint
+  setTimeout(() => {
+    const url = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(S.post)}`;
+    window.open(url, '_blank');
+  }, 450);
+}
+
 
 function updateCharCount(len) {
   const el = document.getElementById('postCharCount'); if (!el) return;
