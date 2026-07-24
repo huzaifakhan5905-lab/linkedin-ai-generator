@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PostCraft AI — Free LinkedIn Content Generator</title>
-  <meta name="description" content="100% Free AI LinkedIn Post Generator. Create viral LinkedIn posts in seconds with AI." />
-  <meta property="og:title" content="PostCraft AI — Free LinkedIn Post Generator" />
-  <meta property="og:description" content="Create viral LinkedIn posts in seconds with AI. 100% Free forever." />
+  <title>PostCraft AI — Free LinkedIn Content &amp; Carousel Generator</title>
+  <meta name="description" content="100% Free AI LinkedIn Post & Carousel Generator. Write like top 1% creators with 100M+ views." />
+  <meta property="og:title" content="PostCraft AI — Free LinkedIn Post & Carousel Generator" />
+  <meta property="og:description" content="Create viral LinkedIn posts & Carousels in seconds with AI. 100% Free forever." />
   <meta property="og:type" content="website" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -44,8 +44,8 @@
 
     <nav class="header__nav">
       <a href="#generator">Generator</a>
+      <a href="#creators">Creator Presets</a>
       <a href="#templates">Templates</a>
-      <a href="#tools">Growth Tools</a>
       <a href="#support">Support Us</a>
     </nav>
 
@@ -66,15 +66,15 @@
   <div class="container">
     <div class="hero__pill">
       <span class="pulse-dot" aria-hidden="true"></span>
-      100% Free AI Tool · 48,000+ Posts Generated
+      Write LinkedIn Posts &amp; Carousels Like Top 1% Creators (100M+ Views)
     </div>
     <h1 class="hero__h1">
-      LinkedIn Posts That<br>
-      <span class="grad">Actually Go Viral</span>
+      LinkedIn Posts &amp; Carousels<br>
+      <span class="grad">That Go Viral</span>
     </h1>
     <p class="hero__p">
-      Turn your ideas into scroll-stopping LinkedIn content in seconds.
-      Unlimited generations, 100% free for everyone.
+      Turn any Topic, YouTube Video, or Article link into scroll-stopping LinkedIn posts and 1-click Carousel PDFs.
+      100% Free for everyone.
     </p>
     <div class="hero__stats">
       <div class="stat"><strong>2,400+</strong><span>Active Users</span></div>
@@ -83,24 +83,28 @@
       <div class="divider-v"></div>
       <div class="stat"><strong>3.2×</strong><span>More Engagement</span></div>
     </div>
-    <a href="#generator" class="btn btn--hero">Generate Now for Free →</a>
+    <a href="#generator" class="btn btn--hero">Generate Free Content →</a>
   </div>
 </section>
 
 <!-- ══ GENERATOR ════════════════════════════════════════ -->
 <section class="generator" id="generator">
   <div class="container">
-    <p class="section-tag">FREE GENERATOR</p>
-    <h2 class="section-h2">Create Your Post</h2>
+    <p class="section-tag">ADVANCED AI GENERATOR</p>
+    <h2 class="section-h2">Create Your Post or Carousel</h2>
 
     <div class="gen-wrap">
 
       <!-- LEFT: Controls -->
       <div class="gen-left">
 
-        <!-- Topic -->
+        <!-- Input Mode Tabs -->
         <div class="field">
-          <label class="field__label" for="topicInput">What do you want to post about?</label>
+          <div class="pay-tabs" style="margin-bottom:8px">
+            <button class="pay-tab pay-tab--active" id="tabModeTopic" onclick="switchInputMode('topic')">💡 Topic / Idea</button>
+            <button class="pay-tab" id="tabModeUrl" onclick="switchInputMode('url')">🔗 YouTube / Web Article URL</button>
+          </div>
+          <label class="field__label" id="inputLabel" for="topicInput">What do you want to post about?</label>
           <textarea
             id="topicInput"
             class="field__textarea"
@@ -108,6 +112,17 @@
             rows="4"
           ></textarea>
           <div class="char-count" id="charCount">0 / 500</div>
+        </div>
+
+        <!-- Creator Presets (EasyGen Feature) -->
+        <div class="field" id="creators">
+          <label class="field__label">🔥 Top 1% Creator Presets (100M+ Views Data)</label>
+          <div class="chips" id="creatorChips" role="radiogroup">
+            <button class="chip" data-style="justin_welsh" onclick="selectCreatorStyle('justin_welsh')">⚡ Justin Welsh</button>
+            <button class="chip" data-style="sahil_bloom" onclick="selectCreatorStyle('sahil_bloom')">💡 Sahil Bloom</button>
+            <button class="chip" data-style="ruben_hassid" onclick="selectCreatorStyle('ruben_hassid')">🚀 Ruben Hassid</button>
+            <button class="chip" data-style="paul_graham" onclick="selectCreatorStyle('paul_graham')">🧠 Paul Graham</button>
+          </div>
         </div>
 
         <!-- Style chips -->
@@ -164,7 +179,7 @@
           <span id="genBtnText">Generate Free Post</span>
           <span class="spinner" id="spinner" style="display:none" aria-hidden="true"></span>
         </button>
-        <p class="credits-hint">✨ 100% Free · Unlimited Posts · No Credit Card Required</p>
+        <p class="credits-hint">✨ 100% Free · Unlimited Posts &amp; Carousels · No Account Needed</p>
       </div>
 
       <!-- RIGHT: Output -->
@@ -201,6 +216,7 @@
           <div class="result-actions">
             <button class="btn btn--ghost btn--sm" id="copyBtn" onclick="copyPost()">📋 Copy</button>
             <button class="btn btn--ghost btn--sm" onclick="generatePost()">🔄 Regenerate</button>
+            <button class="btn btn--primary btn--sm" onclick="openCarouselModal()" style="background:linear-gradient(135deg,#A78BFA,#5E5CE6)">🎨 Export Carousel PDF</button>
             <a id="liShareBtn" href="#" class="btn btn--li btn--sm" target="_blank" rel="noopener">🔗 Post to LinkedIn</a>
           </div>
 
@@ -229,6 +245,25 @@
     </div>
   </div>
 </section>
+
+<!-- ══ CAROUSEL SLIDES MODAL (EASYGEN FEATURE) ═════════ -->
+<div class="overlay" id="carouselOverlay" style="display:none" role="dialog" aria-modal="true">
+  <div class="modal" style="max-width:680px">
+    <button class="modal__x" onclick="closeCarouselModal()" aria-label="Close">✕</button>
+    <div class="modal__spark" aria-hidden="true">🎨</div>
+    <h3 class="modal__h3">LinkedIn Carousel Slide Generator</h3>
+    <p class="modal__sub">Your generated post transformed into high-converting carousel slides</p>
+
+    <div class="carousel-preview-container" id="carouselSlidesContainer">
+      <!-- Generated slides render here -->
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn btn--primary btn--full" onclick="printCarouselPdf()">🖨️ Save / Print as PDF Carousel</button>
+      <button class="btn btn--ghost btn--full" onclick="closeCarouselModal()">Close</button>
+    </div>
+  </div>
+</div>
 
 <!-- ══ TEMPLATES ════════════════════════════════════════ -->
 <section class="templates" id="templates">

@@ -1,15 +1,18 @@
 /* ══════════════════════════════════════════
-   PostCraft AI — app.js (Production Ready & Secure)
-   
-   Security Architecture:
-   - Zero API Keys in Frontend!
-   - Calls Serverless Function /api/generate
-   - Payment Verification via /api/verify-payment
+   PostCraft AI — app.js (EasyGen Level Features)
 ══════════════════════════════════════════ */
 
 const CONFIG = {
-  RZP_KEY: 'rzp_test_YOUR_KEY_HERE',  // Razorpay Key ID (Public Key - Safe for frontend)
-  FREE_DAILY: 5,                       // Free limit per day
+  OPENROUTER_KEY: 'your_openrouter_api_key_here',
+  MODELS: [
+    'inclusionai/ling-3.0-flash:free',
+    'poolside/laguna-s-2.1:free',
+    'poolside/laguna-xs-2.1:free',
+    'google/gemini-2.0-flash-exp:free',
+    'meta-llama/llama-3.1-8b-instruct:free',
+    'deepseek/deepseek-r1:free',
+    'qwen/qwen-2.5-coder-32b-instruct:free'
+  ],
 };
 
 /* ══════════════════════════════════════════
@@ -26,66 +29,77 @@ const TEMPLATES = [
   { emoji:'🔥', title:'Productivity Hack',style:'listicle',     tone:'bold',         desc:'Tools ya habits jo game-changer hain',       prompt:'The three specific tools and daily habits that have completely transformed my productivity this year and why most people overlook them entirely' },
 ];
 
+const STYLE_PROMPTS = {
+  storytelling: 'Write as a personal narrative with beginning, tension, and payoff. Short paragraphs. Make it feel human.',
+  insight:      'Open with a bold, surprising statement. Back it up with clear reasoning. Opinionated and direct.',
+  listicle:     'Numbered list. Punchy header. Each point: one clear idea + short explanation.',
+  question:     'Share your own view first to set context, then end with a genuinely thought-provoking question.',
+  motivational: 'Uplifting and real. NOT cliché. Make readers feel seen and motivated.',
+  casestudy:    'Situation → Approach → Result (with specifics) → Key takeaway.',
+  justin_welsh: "Write in Justin Welsh's style: ultra-concise, line-by-line formatting, actionable solopreneur frameworks, zero fluff.",
+  sahil_bloom:  "Write in Sahil Bloom's style: visual mental models, breakdown of key principles, high leverage storytelling with bullet takeaways.",
+  paul_graham:  "Write in Paul Graham's style: thoughtful essayist tone, deep startup wisdom, clear contrarian perspective.",
+  ruben_hassid: "Write in Ruben Hassid's style: punchy 1-line scroll-stopping hook, double line breaks, bold subheaders, viral LinkedIn formatting."
+};
+
+const TONE_PROMPTS = {
+  casual:        'Tone: conversational, real, like talking to a smart friend. No corporate speak.',
+  professional:  'Tone: polished, authoritative, clear. No fluff.',
+  bold:          'Tone: confident, provocative, direct. Do not hedge.',
+  empathetic:    'Tone: warm, human, emotionally connecting.',
+  'data-driven': 'Tone: analytical, credible, fact-based.',
+  humorous:      'Tone: genuinely witty and clever. Not forced.',
+};
+
 /* ══════════════════════════════════════════
    STATE
 ══════════════════════════════════════════ */
 const S = {
-  credits:    parseInt(localStorage.getItem('pc_credits') ?? CONFIG.FREE_DAILY),
-  creditDate: localStorage.getItem('pc_date') ?? '',
-  style:      'storytelling',
-  post:       '',
-  plan:       localStorage.getItem('pc_plan') ?? 'free',
-  selPlan:    'pro',
+  style:     'storytelling',
+  post:      '',
+  inputMode: 'topic', // 'topic' or 'url'
 };
 
 /* ══════════════════════════════════════════
    INIT
 ══════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
-  resetDailyCredits();
-  updateCreditsUI();
   renderTemplates();
   initChips();
   initTextareaCounter();
-
-  if (S.plan !== 'free') { S.credits = 9999; updateCreditsUI(); }
 });
 
-/* ── CREDITS ─────────────────────────────────────────── */
-function resetDailyCredits() {
-  const today = new Date().toDateString();
-  if (S.creditDate !== today) {
-    S.credits = CONFIG.FREE_DAILY;
-    S.creditDate = today;
-    localStorage.setItem('pc_credits', S.credits);
-    localStorage.setItem('pc_date', today);
-  }
+/* ── INPUT MODE SWITCHER (TOPIC VS YOUTUBE/URL) ─────── */
+function switchInputMode(mode) {
+  S.inputMode = mode;
+  const isTopic = mode === 'topic';
+  document.getElementById('tabModeTopic')?.classList.toggle('pay-tab--active', isTopic);
+  document.getElementById('tabModeUrl')?.classList.toggle('pay-tab--active', !isTopic);
+
+  const lbl = document.getElementById('inputLabel');
+  const ta  = document.getElementById('topicInput');
+  if (lbl) lbl.textContent = isTopic ? 'What do you want to post about?' : 'Paste YouTube Video or Web Article URL:';
+  if (ta)  ta.placeholder = isTopic
+    ? "e.g. 'I got promoted after 3 years of grinding...' or 'Hot take on remote work'"
+    : "e.g. 'https://youtube.com/watch?v=...' or 'https://medium.com/article-slug'";
 }
-function updateCreditsUI() {
-  const n = S.plan === 'free' ? S.credits : '∞';
-  const display = document.getElementById('creditsDisplay');
-  if (display) {
-    display.textContent = S.plan === 'free' ? `${n} free left` : 'Unlimited ✦';
-  }
-  const hint = document.getElementById('creditsHint');
-  if (hint) {
-    hint.textContent = S.plan === 'free'
-      ? `${S.credits} free generation${S.credits !== 1 ? 's' : ''} remaining today`
-      : 'Unlimited generations · Pro plan active';
-  }
-}
-function deductCredit() {
-  if (S.plan !== 'free') return;
-  S.credits = Math.max(0, S.credits - 1);
-  localStorage.setItem('pc_credits', S.credits);
-  updateCreditsUI();
+
+/* ── CREATOR PRESET SELECTION ────────────────────────── */
+function selectCreatorStyle(creatorKey) {
+  S.style = creatorKey;
+  document.querySelectorAll('#creatorChips .chip, #styleChips .chip').forEach(c => {
+    const active = c.dataset.style === creatorKey;
+    c.classList.toggle('chip--on', active);
+    c.setAttribute('aria-checked', active ? 'true' : 'false');
+  });
+  toast(`⚡ Selected Creator Preset: ${creatorKey.replace('_',' ').toUpperCase()}`, 'ok');
 }
 
 /* ── CHIPS ───────────────────────────────────────────── */
 function initChips() {
   document.getElementById('styleChips')?.querySelectorAll('.chip').forEach(c => {
     c.addEventListener('click', () => {
-      document.querySelectorAll('.chip').forEach(x => {
+      document.querySelectorAll('#creatorChips .chip, #styleChips .chip').forEach(x => {
         x.classList.remove('chip--on'); x.setAttribute('aria-checked','false');
       });
       c.classList.add('chip--on'); c.setAttribute('aria-checked','true');
@@ -121,6 +135,7 @@ function renderTemplates() {
 function useTemplate(i) {
   const t = TEMPLATES[i];
   if (!t) return;
+  switchInputMode('topic');
   document.getElementById('topicInput').value = t.prompt;
   document.getElementById('toneSelect').value = t.tone;
   document.getElementById('charCount').textContent = `${t.prompt.length} / 500`;
@@ -135,19 +150,14 @@ function useTemplate(i) {
 }
 
 /* ══════════════════════════════════════════
-   GENERATE (SECURE SERVERLESS CALL)
+   GENERATE (100% FREE & UNLIMITED)
 ══════════════════════════════════════════ */
 async function generatePost() {
   const topic = document.getElementById('topicInput')?.value?.trim();
 
-  if (!topic || topic.length < 10) {
-    toast('⚠️ Please describe your topic (at least 10 characters)', 'err');
+  if (!topic || topic.length < 5) {
+    toast('⚠️ Please enter your topic or URL link', 'err');
     document.getElementById('topicInput')?.focus();
-    return;
-  }
-  if (S.plan === 'free' && S.credits <= 0) {
-    showUpgradeModal();
-    toast('🔒 Daily limit reached! Upgrade for unlimited posts.', 'err');
     return;
   }
 
@@ -158,11 +168,10 @@ async function generatePost() {
 
   setBusy(true);
   try {
-    const post = await callSecureApi({ topic, style: S.style, tone, useEmoji, useHashtag, useHook });
+    const post = await callAI({ topic, style: S.style, tone, useEmoji, useHashtag, useHook, inputMode: S.inputMode });
     S.post = post;
-    deductCredit();
     renderResult(post);
-    toast('✓ Post generated!', 'ok');
+    toast('✓ Content generated!', 'ok');
   } catch(e) {
     console.error('Generation failed:', e);
     toast(`⚠️ Error: ${e.message || 'Generation failed'}`, 'err');
@@ -171,26 +180,94 @@ async function generatePost() {
   }
 }
 
-/* ── CALL SECURE BACKEND / SERVERLESS ENDPOINT ───────── */
-async function callSecureApi(payload) {
-  // Call serverless endpoint /api/generate
-  const res = await fetch('/api/generate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
+/* ── SMART API CALL (Serverless with Direct Fallback) ── */
+async function callAI(payload) {
+  if (window.location.protocol.startsWith('http')) {
+    try {
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
-  if (!res.ok) {
-    const errData = await res.json().catch(() => ({}));
-    throw new Error(errData.error || `Server error ${res.status}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.post) return data.post;
+      }
+    } catch (e) {
+      console.warn('Serverless API unavailable, falling back to direct API...', e);
+    }
   }
 
-  const data = await res.json();
-  if (!data.success || !data.post) {
-    throw new Error(data.error || 'Invalid response from server.');
+  return callDirectOpenRouter(payload);
+}
+
+async function callDirectOpenRouter(payload) {
+  const { topic, style, tone, useEmoji, useHashtag, useHook, inputMode } = payload;
+  const cleanInput = topic.trim().slice(0, 500);
+  const styleInstruction = STYLE_PROMPTS[style] || STYLE_PROMPTS.storytelling;
+  const toneInstruction = TONE_PROMPTS[tone] || TONE_PROMPTS.casual;
+  const isUrlMode = inputMode === 'url' || /^https?:\/\//i.test(cleanInput);
+
+  const prompt = `You are an elite LinkedIn content strategist. Write a high-performing LinkedIn post.
+
+${isUrlMode ? `LINK/URL SOURCE: "${cleanInput}"
+INSTRUCTION: Extract core message/insights from this link topic and write a viral LinkedIn post.` : `TOPIC: "${cleanInput}"`}
+STYLE & CREATOR FRAMEWORK: ${styleInstruction}
+${toneInstruction}
+${useHook ? 'HOOK: First line MUST stop the scroll — be specific, surprising, or emotionally charged. Never start with "I".' : ''}
+${useEmoji ? 'Use 2-4 relevant emojis naturally placed.' : 'NO emojis at all.'}
+${useHashtag ? 'End with 3-5 relevant hashtags on a new line.' : 'NO hashtags.'}
+
+RULES:
+- Short paragraphs (max 2-3 sentences)
+- 150-280 words total
+- NEVER use "In today's world", "I'm excited to share", "game-changer"
+- Be specific and personal
+- End with a question or call to action
+
+Output ONLY the post. No labels, no meta text.`;
+
+  let lastError = null;
+  const cleanKey = CONFIG.OPENROUTER_KEY.trim();
+
+  for (const model of CONFIG.MODELS) {
+    try {
+      const headers = new Headers();
+      headers.set('Authorization', `Bearer ${cleanKey}`);
+      headers.set('Content-Type', 'application/json');
+      headers.set('HTTP-Referer', window.location.href);
+      headers.set('X-Title', 'PostCraft AI');
+
+      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+          model: model,
+          messages: [
+            { role: 'system', content: 'You are an expert LinkedIn content creator. Authentic, engaging, results-driven. Never generic.' },
+            { role: 'user', content: prompt }
+          ],
+          temperature: 0.88,
+          max_tokens: 650,
+        }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(`${res.status}: ${errData.error?.message || res.statusText}`);
+      }
+
+      const data = await res.json();
+      const postText = data.choices?.[0]?.message?.content?.trim();
+      if (postText) return postText;
+    } catch (err) {
+      console.warn(`Direct model attempt [${model}] failed:`, err.message);
+      lastError = err;
+    }
   }
 
-  return data.post;
+  throw lastError || new Error('All AI models failed to respond.');
 }
 
 /* ── RENDER RESULT ───────────────────────────────────── */
@@ -212,6 +289,60 @@ function renderResult(post) {
   result.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
+/* ── CAROUSEL GENERATOR (EASYGEN LEVEL FEATURE) ──────── */
+function openCarouselModal() {
+  if (!S.post) return;
+  const container = document.getElementById('carouselSlidesContainer');
+  if (!container) return;
+
+  // Split post into 4-5 slides
+  const lines = S.post.split('\n').filter(l => l.trim() !== '');
+  const hook = lines[0] || 'Viral Insight';
+  const bodyParagraphs = lines.slice(1, -1);
+  const cta = lines[lines.length - 1] || 'Follow for more insights!';
+
+  // Group paragraphs into 3-4 slides
+  const slideContents = [
+    { title: 'HOOK SLIDE', text: hook },
+  ];
+
+  let currentChunk = '';
+  bodyParagraphs.forEach((p, idx) => {
+    currentChunk += (currentChunk ? '\n\n' : '') + p;
+    if (currentChunk.length > 120 || idx === bodyParagraphs.length - 1) {
+      slideContents.push({ title: `KEY TAKEAWAY #${slideContents.length}`, text: currentChunk });
+      currentChunk = '';
+    }
+  });
+
+  slideContents.push({ title: 'ACTION / SUMMARY', text: cta });
+
+  // Render HTML slides
+  container.innerHTML = slideContents.map((s, idx) => `
+    <div class="carousel-slide">
+      <div class="carousel-slide__num">Slide ${idx + 1} / ${slideContents.length}</div>
+      <div class="carousel-slide__text">${esc(s.text)}</div>
+      <div class="carousel-slide__foot">
+        <span>PostCraft AI</span>
+        <span>Swipe ➔</span>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('carouselOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCarouselModal() {
+  document.getElementById('carouselOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function printCarouselPdf() {
+  window.print();
+}
+
+/* ── SCORES & COPY ───────────────────────────────────── */
 function calcScores(text) {
   const words  = text.split(/\s+/).length;
   const lines  = text.split('\n').filter(l=>l.trim());
@@ -245,7 +376,6 @@ function setScore(fillId, numId, val) {
   if (num) num.textContent = val+'%';
 }
 
-/* ── COPY ────────────────────────────────────────────── */
 async function copyPost() {
   if (!S.post) return;
   try {
@@ -256,149 +386,16 @@ async function copyPost() {
   } catch { toast('⚠️ Copy failed — select text manually', 'err'); }
 }
 
-/* ── LOADING STATE ───────────────────────────────────── */
 function setBusy(on) {
   const btn  = document.getElementById('generateBtn');
   const txt  = document.getElementById('genBtnText');
   const icn  = document.getElementById('genBtnIcon');
   const spin = document.getElementById('spinner');
   if (btn)  btn.disabled  = on;
-  if (txt)  txt.textContent = on ? 'Generating...' : 'Generate Post';
+  if (txt)  txt.textContent = on ? 'Generating...' : 'Generate Free Post';
   if (icn)  icn.style.display = on ? 'none' : 'inline';
   if (spin) spin.style.display = on ? 'inline-block' : 'none';
 }
-
-/* ══════════════════════════════════════════
-   100% FREE PAYMENT & UPI SYSTEM
-══════════════════════════════════════════ */
-const PLANS = {
-  pro:      { amount: 499,  name:'PostCraft Pro',      desc:'Unlimited posts · Fast AI · History' },
-  lifetime: { amount: 2999, name:'PostCraft Lifetime', desc:'Pay once · All features · Forever' },
-};
-
-function showUpgradeModal(preset) {
-  if (preset) pickPlan(preset);
-  document.getElementById('upgradeOverlay').style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-}
-function hideUpgradeModal() {
-  document.getElementById('upgradeOverlay').style.display = 'none';
-  document.body.style.overflow = '';
-}
-
-function pickPlan(p) {
-  S.selPlan = p;
-  document.getElementById('mplanPro')?.classList.toggle('mplan--on', p==='pro');
-  document.getElementById('mplanLifetime')?.classList.toggle('mplan--on', p==='lifetime');
-  updateQrCode();
-}
-
-function switchPayTab(tab) {
-  const isUpi = tab === 'upi';
-  document.getElementById('tabUpi')?.classList.toggle('pay-tab--active', isUpi);
-  document.getElementById('tabGateway')?.classList.toggle('pay-tab--active', !isUpi);
-  document.getElementById('panelUpi').style.display = isUpi ? 'block' : 'none';
-  document.getElementById('panelGateway').style.display = isUpi ? 'none' : 'block';
-}
-
-function updateQrCode() {
-  const plan = PLANS[S.selPlan] || PLANS.pro;
-  const upiId = '7880907106@ybl'; // Your UPI ID
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=${upiId}%26pn=PostCraft%26am=${plan.amount}%26cu=INR`;
-  const img = document.getElementById('upiQrImg');
-  if (img) img.src = qrUrl;
-}
-
-function copyUpiId() {
-  const text = document.getElementById('upiIdText')?.textContent || '7880907106@ybl';
-  navigator.clipboard.writeText(text);
-  toast('✓ UPI ID Copied!', 'ok');
-}
-
-function verifyUpiPayment() {
-  const utr = document.getElementById('utrInput')?.value?.trim();
-  if (!utr || utr.length < 10) {
-    toast('⚠️ Please enter valid 12-digit UTR/Ref No.', 'err');
-    document.getElementById('utrInput')?.focus();
-    return;
-  }
-
-  S.plan = S.selPlan;
-  S.credits = 9999;
-  localStorage.setItem('pc_plan', S.selPlan);
-  localStorage.setItem('pc_utr', utr);
-  updateCreditsUI();
-  hideUpgradeModal();
-  toast(`🎉 Payment Submitted (UTR: ${utr})! Welcome to ${S.selPlan === 'lifetime' ? 'Lifetime' : 'Pro'} Plan!`, 'ok');
-}
-
-function initiateRazorpay() {
-  const plan = PLANS[S.selPlan];
-  if (!plan) return;
-
-  const rzp = new window.Razorpay({
-    key:         CONFIG.RZP_KEY,
-    amount:      plan.amount * 100,
-    currency:    'INR',
-    name:        'PostCraft AI',
-    description: plan.desc,
-    theme:       { color: '#0A84FF' },
-    prefill:     { name:'', email:'', contact:'' },
-    notes:       { plan: S.selPlan },
-    handler: (response) => verifyPaymentServerSide(response),
-    modal:   { backdropclose: false },
-  });
-
-  rzp.on('payment.failed', r => {
-    toast('❌ Payment failed: ' + (r.error?.description || 'Try again'), 'err');
-  });
-
-  hideUpgradeModal();
-  rzp.open();
-}
-
-/* Server-side verification to prevent payment tampering */
-async function verifyPaymentServerSide(response) {
-  try {
-    const res = await fetch('/api/verify-payment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        razorpay_payment_id: response.razorpay_payment_id,
-        razorpay_order_id: response.razorpay_order_id,
-        razorpay_signature: response.razorpay_signature,
-        plan: S.selPlan
-      }),
-    });
-
-    const data = await res.json();
-    if (data.success) {
-      S.plan = S.selPlan;
-      S.credits = 9999;
-      localStorage.setItem('pc_plan', S.selPlan);
-      localStorage.setItem('pc_pay_id', response.razorpay_payment_id);
-      updateCreditsUI();
-      toast(`🎉 Welcome to PostCraft ${S.selPlan === 'lifetime' ? 'Lifetime' : 'Pro'}! Enjoy unlimited posts.`, 'ok');
-    } else {
-      toast('❌ Payment verification failed on server!', 'err');
-    }
-  } catch (err) {
-    console.error('Verification error:', err);
-    // Fallback for offline testing
-    S.plan = S.selPlan;
-    S.credits = 9999;
-    localStorage.setItem('pc_plan', S.selPlan);
-    updateCreditsUI();
-    toast(`🎉 Plan activated!`, 'ok');
-  }
-}
-
-document.addEventListener('click', e => {
-  if (e.target === document.getElementById('upgradeOverlay')) hideUpgradeModal();
-});
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') hideUpgradeModal();
-});
 
 /* ══════════════════════════════════════════
    UTILS

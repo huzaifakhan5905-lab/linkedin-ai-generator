@@ -1,4 +1,4 @@
-// api/generate.js - Secure Vercel Serverless Function for AI Generation
+// api/generate.js - Secure Vercel Serverless Function for AI Generation with EasyGen Features
 
 const MODELS = [
   'inclusionai/ling-3.0-flash:free',
@@ -17,6 +17,11 @@ const STYLE_PROMPTS = {
   question:     'Share your own view first to set context, then end with a genuinely thought-provoking question.',
   motivational: 'Uplifting and real. NOT cliché. Make readers feel seen and motivated.',
   casestudy:    'Situation → Approach → Result (with specifics) → Key takeaway.',
+  // Viral Creator Presets (EasyGen Level)
+  justin_welsh: "Write in Justin Welsh's style: ultra-concise, line-by-line formatting, actionable 1-person business systems, zero fluff.",
+  sahil_bloom:  "Write in Sahil Bloom's style: visual mental models, breakdown of key principles, high leverage storytelling with 5 bullet takeaways.",
+  paul_graham:  "Write in Paul Graham's style: thoughtful essayist tone, deep startup wisdom, clear contrarian perspective.",
+  ruben_hassid: "Write in Ruben Hassid's style: punchy 1-line scroll-stopping hook, double line breaks, bold subheaders, viral LinkedIn formatting."
 };
 
 const TONE_PROMPTS = {
@@ -29,8 +34,7 @@ const TONE_PROMPTS = {
 };
 
 export default async function handler(req, res) {
-  // CORS Headers
-  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader(
@@ -46,27 +50,29 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const apiKey = process.env.OPENROUTER_API_KEY;
+  const apiKey = (process.env.OPENROUTER_API_KEY || '').trim();
   if (!apiKey) {
     return res.status(500).json({ error: 'OPENROUTER_API_KEY is not configured on the server.' });
   }
 
-  const { topic, style, tone, useEmoji, useHashtag, useHook } = req.body || {};
+  const { topic, style, tone, useEmoji, useHashtag, useHook, inputMode } = req.body || {};
 
-  if (!topic || typeof topic !== 'string' || topic.trim().length < 10) {
-    return res.status(400).json({ error: 'Topic must be at least 10 characters long.' });
+  if (!topic || typeof topic !== 'string' || topic.trim().length < 5) {
+    return res.status(400).json({ error: 'Topic or URL must be provided.' });
   }
 
-  // Sanitize length
-  const cleanTopic = topic.trim().slice(0, 500);
-
+  const cleanInput = topic.trim().slice(0, 700);
   const styleInstruction = STYLE_PROMPTS[style] || STYLE_PROMPTS.storytelling;
   const toneInstruction = TONE_PROMPTS[tone] || TONE_PROMPTS.casual;
 
-  const prompt = `You are an elite LinkedIn content strategist. Write a high-performing LinkedIn post.
+  const isUrlMode = inputMode === 'url' || /^https?:\/\//i.test(cleanInput);
 
-TOPIC: "${cleanTopic}"
-STYLE: ${styleInstruction}
+  const prompt = `You are an elite LinkedIn content strategist (EasyGen-level quality). Write a high-performing LinkedIn post.
+
+${isUrlMode ? `LINK/URL SOURCE: "${cleanInput}"
+INSTRUCTION: Extract the core ideas, key lessons, or main message from this link/video topic and reframe it into a viral, high-converting LinkedIn post.` : `TOPIC: "${cleanInput}"`}
+
+STYLE & CREATOR FRAMEWORK: ${styleInstruction}
 ${toneInstruction}
 ${useHook ? 'HOOK: First line MUST stop the scroll — be specific, surprising, or emotionally charged. Never start with "I".' : ''}
 ${useEmoji ? 'Use 2-4 relevant emojis naturally placed.' : 'NO emojis at all.'}
@@ -76,7 +82,7 @@ RULES:
 - Short paragraphs (max 2-3 sentences)
 - 150-280 words total
 - NEVER use "In today's world", "I'm excited to share", "game-changer"
-- Be specific and personal
+- Be specific, authentic, and punchy
 - End with a question or call to action
 
 Output ONLY the post. No labels, no meta text.`;
@@ -85,7 +91,6 @@ Output ONLY the post. No labels, no meta text.`;
 
   for (const model of MODELS) {
     try {
-      // Create fresh headers object for each request to prevent any header mutation/append accumulation
       const reqHeaders = new Headers();
       reqHeaders.set('Authorization', `Bearer ${apiKey}`);
       reqHeaders.set('Content-Type', 'application/json');
@@ -98,7 +103,7 @@ Output ONLY the post. No labels, no meta text.`;
         body: JSON.stringify({
           model: model,
           messages: [
-            { role: 'system', content: 'You are an expert LinkedIn content creator. Authentic, engaging, results-driven. Never generic.' },
+            { role: 'system', content: 'You are an expert LinkedIn content creator. Authentic, engaging, viral formatting. Never generic.' },
             { role: 'user', content: prompt }
           ],
           temperature: 0.88,
