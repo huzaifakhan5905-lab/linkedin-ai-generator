@@ -1443,10 +1443,22 @@ async function callAPI(payload) {
 }
 
 function getClientFallback(payload) {
-  const t = (payload.topic || payload.postContent || payload.currentRole || 'growth and career').trim();
-  const clean = t.length > 25 ? t : `How to master ${t}`;
-  return `${clean}\n\nHere are 3 key principles for continuous growth:\n\n1. Focus on consistency over intensity.\n2. Prioritize strategy before execution.\n3. Measure real impact, not just activity.\n\nWhat is your #1 takeaway? Let me know in the comments below! 👇\n\n#Growth #Leadership #Success #LinkedIn`;
+  let t = (payload.topic || payload.postContent || payload.currentRole || 'career growth and valuable lessons').trim();
+  if (/^https?:\/\//i.test(t)) {
+    t = 'Key insights from this featured content:';
+  }
+  
+  let hook = t;
+  if (t.length > 25 && !t.endsWith('?')) {
+    hook = t.charAt(0).toUpperCase() + t.slice(1);
+    if (!/[.!:]$/.test(hook)) hook += '.';
+  } else if (!/^https?:\/\//i.test(t)) {
+    hook = `How to master ${t}:`;
+  }
+
+  return `${hook}\n\nHere are 3 key principles for continuous growth:\n\n1. Focus on consistency over intensity.\n2. Prioritize strategy before execution.\n3. Measure real impact, not just activity.\n\nWhat is your #1 takeaway? Let me know in the comments below! 👇\n\n#Growth #Leadership #Success #LinkedIn`;
 }
+
 
 
 
