@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PostCraft AI — LinkedIn Content Generator</title>
-  <meta name="description" content="Generate viral LinkedIn posts in seconds with AI. Grow your personal brand effortlessly." />
-  <meta property="og:title" content="PostCraft AI — LinkedIn Content Generator" />
-  <meta property="og:description" content="AI-powered LinkedIn posts that actually go viral. Try free." />
+  <title>PostCraft AI — Free LinkedIn Content Generator</title>
+  <meta name="description" content="100% Free AI LinkedIn Post Generator. Create viral LinkedIn posts in seconds with AI." />
+  <meta property="og:title" content="PostCraft AI — Free LinkedIn Post Generator" />
+  <meta property="og:description" content="Create viral LinkedIn posts in seconds with AI. 100% Free forever." />
   <meta property="og:type" content="website" />
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
@@ -44,19 +43,20 @@
     </a>
 
     <nav class="header__nav">
-      <a href="#generator">Generate</a>
+      <a href="#generator">Generator</a>
       <a href="#templates">Templates</a>
-      <a href="#pricing">Pricing</a>
+      <a href="#tools">Growth Tools</a>
+      <a href="#support">Support Us</a>
     </nav>
 
     <div class="header__right">
-      <div class="credits-pill" id="creditsPill">
+      <div class="credits-pill">
         <span class="credits-dot" aria-hidden="true"></span>
-        <span id="creditsDisplay">5 free left</span>
+        <span>100% Free Forever ✦</span>
       </div>
-      <button class="btn btn--primary btn--sm" onclick="showUpgradeModal()">
-        Upgrade ✦
-      </button>
+      <a href="#support" class="btn btn--primary btn--sm">
+        Coffee ☕
+      </a>
     </div>
   </div>
 </header>
@@ -66,7 +66,7 @@
   <div class="container">
     <div class="hero__pill">
       <span class="pulse-dot" aria-hidden="true"></span>
-      AI-Powered · 48,000+ Posts Generated
+      100% Free AI Tool · 48,000+ Posts Generated
     </div>
     <h1 class="hero__h1">
       LinkedIn Posts That<br>
@@ -74,7 +74,7 @@
     </h1>
     <p class="hero__p">
       Turn your ideas into scroll-stopping LinkedIn content in seconds.
-      Join 2,400+ professionals growing their brand with AI.
+      Unlimited generations, 100% free for everyone.
     </p>
     <div class="hero__stats">
       <div class="stat"><strong>2,400+</strong><span>Active Users</span></div>
@@ -83,14 +83,14 @@
       <div class="divider-v"></div>
       <div class="stat"><strong>3.2×</strong><span>More Engagement</span></div>
     </div>
-    <a href="#generator" class="btn btn--hero">Generate for Free →</a>
+    <a href="#generator" class="btn btn--hero">Generate Now for Free →</a>
   </div>
 </section>
 
 <!-- ══ GENERATOR ════════════════════════════════════════ -->
 <section class="generator" id="generator">
   <div class="container">
-    <p class="section-tag">GENERATOR</p>
+    <p class="section-tag">FREE GENERATOR</p>
     <h2 class="section-h2">Create Your Post</h2>
 
     <div class="gen-wrap">
@@ -161,10 +161,10 @@
         <!-- Generate -->
         <button class="btn btn--generate" id="generateBtn" onclick="generatePost()">
           <span id="genBtnIcon">✦</span>
-          <span id="genBtnText">Generate Post</span>
+          <span id="genBtnText">Generate Free Post</span>
           <span class="spinner" id="spinner" style="display:none" aria-hidden="true"></span>
         </button>
-        <p class="credits-hint" id="creditsHint">5 free generations remaining today</p>
+        <p class="credits-hint">✨ 100% Free · Unlimited Posts · No Credit Card Required</p>
       </div>
 
       <!-- RIGHT: Output -->
@@ -240,138 +240,95 @@
   </div>
 </section>
 
-<!-- ══ PRICING ══════════════════════════════════════════ -->
-<section class="pricing" id="pricing">
+<!-- ══ RECOMMENDED TOOLS (AFFILIATE MONETIZATION) ═══════ -->
+<section class="templates" id="tools" style="border-top:1px solid var(--border)">
   <div class="container">
-    <p class="section-tag">PRICING</p>
-    <h2 class="section-h2">Simple, Honest Pricing</h2>
+    <p class="section-tag">MONETIZED RESOURCES</p>
+    <h2 class="section-h2">Recommended Growth Tools</h2>
+    <p class="section-sub">Essential tools top LinkedIn creators use to grow 10x faster</p>
 
-    <div class="plans">
-      <!-- Free -->
-      <div class="plan">
-        <div class="plan__name">Free</div>
-        <div class="plan__price"><strong>₹0</strong><span>/month</span></div>
-        <ul class="plan__features">
-          <li class="yes">5 posts per day</li>
-          <li class="yes">All 6 post styles</li>
-          <li class="yes">All tones &amp; options</li>
-          <li class="no">Unlimited generation</li>
-          <li class="no">Post history</li>
-          <li class="no">Priority AI model</li>
-        </ul>
-        <button class="btn btn--outline btn--full" disabled>Current Plan</button>
-      </div>
+    <div class="templates-grid">
 
-      <!-- Pro -->
-      <div class="plan plan--featured">
-        <div class="plan__badge">Most Popular</div>
-        <div class="plan__name">Pro</div>
-        <div class="plan__price"><strong>₹499</strong><span>/month</span></div>
-        <div class="plan__note">~$6/mo · Cancel anytime</div>
-        <ul class="plan__features">
-          <li class="yes">Unlimited posts</li>
-          <li class="yes">Faster AI model</li>
-          <li class="yes">Post history (saved)</li>
-          <li class="yes">Priority support</li>
-          <li class="yes">Post scheduler <em>(soon)</em></li>
-          <li class="yes">Analytics <em>(soon)</em></li>
-        </ul>
-        <button class="btn btn--primary btn--full" onclick="showUpgradeModal('pro')">Get Pro — ₹499/mo</button>
-      </div>
+      <!-- Canva -->
+      <a href="https://canva.com" target="_blank" rel="noopener noreferrer" class="tcard" style="text-decoration:none">
+        <span class="tcard__emoji">🎨</span>
+        <div class="tcard__title">Canva Pro</div>
+        <div class="tcard__desc">Create stunning LinkedIn carousel slides, banners, and graphics in 2 minutes.</div>
+        <div class="tcard__cta">Try Canva Pro Free →</div>
+      </a>
 
-      <!-- Lifetime -->
-      <div class="plan">
-        <div class="plan__name">Lifetime</div>
-        <div class="plan__price"><strong>₹2,999</strong><span>once</span></div>
-        <div class="plan__note">Pay once, use forever</div>
-        <ul class="plan__features">
-          <li class="yes">Everything in Pro</li>
-          <li class="yes">All future features</li>
-          <li class="yes">2 team seats</li>
-          <li class="yes">API access</li>
-          <li class="yes">White-label option</li>
-          <li class="yes">Dedicated support</li>
-        </ul>
-        <button class="btn btn--outline btn--full" onclick="showUpgradeModal('lifetime')">Get Lifetime — ₹2,999</button>
-      </div>
+      <!-- Taplio -->
+      <a href="https://taplio.com" target="_blank" rel="noopener noreferrer" class="tcard" style="text-decoration:none">
+        <span class="tcard__emoji">📈</span>
+        <div class="tcard__title">Taplio</div>
+        <div class="tcard__desc">Schedule LinkedIn posts, automate outreach, and analyze detailed profile metrics.</div>
+        <div class="tcard__cta">Explore Taplio →</div>
+      </a>
+
+      <!-- Hostinger -->
+      <a href="https://hostinger.com" target="_blank" rel="noopener noreferrer" class="tcard" style="text-decoration:none">
+        <span class="tcard__emoji">🌐</span>
+        <div class="tcard__title">Hostinger Portfolio Website</div>
+        <div class="tcard__desc">Build a personal brand website with free custom domain and fast hosting.</div>
+        <div class="tcard__cta">Get 75% Off Hosting →</div>
+      </a>
+
+      <!-- Notion -->
+      <a href="https://notion.so" target="_blank" rel="noopener noreferrer" class="tcard" style="text-decoration:none">
+        <span class="tcard__emoji">📝</span>
+        <div class="tcard__title">Notion Content Planner</div>
+        <div class="tcard__desc">Organize your post ideas, content calendar, and personal branding pipeline.</div>
+        <div class="tcard__cta">Get Free Template →</div>
+      </a>
+
     </div>
   </div>
 </section>
 
-<!-- ══ UPGRADE MODAL (100% FREE SETUP) ══════════════════ -->
-<div class="overlay" id="upgradeOverlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="modalHeading">
-  <div class="modal">
-    <button class="modal__x" onclick="hideUpgradeModal()" aria-label="Close">✕</button>
-    <div class="modal__spark" aria-hidden="true">✦</div>
-    <h3 class="modal__h3" id="modalHeading">Upgrade PostCraft AI</h3>
-    <p class="modal__sub">Choose your plan and pay securely</p>
+<!-- ══ SUPPORT & CONSULTING (DIRECT MONETIZATION) ════════ -->
+<section class="pricing" id="support">
+  <div class="container">
+    <p class="section-tag">SUPPORT & SERVICES</p>
+    <h2 class="section-h2">Love This Free Tool?</h2>
 
-    <!-- Plan picker -->
-    <div class="modal-plans">
-      <button class="mplan mplan--on" id="mplanPro" onclick="pickPlan('pro')">
-        <div class="mplan__row">
-          <span class="mplan__name">Pro</span>
-          <span class="mplan__tag">Popular</span>
-        </div>
-        <div class="mplan__price"><strong>₹499</strong><span>/mo</span></div>
-        <div class="mplan__desc">Unlimited · Fast AI · History</div>
-      </button>
-      <button class="mplan" id="mplanLifetime" onclick="pickPlan('lifetime')">
-        <div class="mplan__row">
-          <span class="mplan__name">Lifetime</span>
-          <span class="mplan__tag mplan__tag--gold">Best Value</span>
-        </div>
-        <div class="mplan__price"><strong>₹2,999</strong><span>once</span></div>
-        <div class="mplan__desc">Pay once · All features forever</div>
-      </button>
-    </div>
+    <div class="plans" style="grid-template-columns: 1fr 1fr;">
 
-    <!-- Payment Tabs -->
-    <div class="pay-tabs">
-      <button class="pay-tab pay-tab--active" id="tabUpi" onclick="switchPayTab('upi')">⚡ Instant UPI (0% Fee)</button>
-      <button class="pay-tab" id="tabGateway" onclick="switchPayTab('gateway')">💳 Card / Cashfree / Link</button>
-    </div>
-
-    <!-- TAB 1: UPI QR CODE (100% ZERO COST & ZERO KYC FEE) -->
-    <div class="pay-panel" id="panelUpi">
-      <div class="upi-box">
-        <div class="qr-wrap">
-          <img id="upiQrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=7880907106@ybl%26pn=PostCraft%26am=499%26cu=INR" alt="UPI QR Code" />
-        </div>
-        <div class="upi-info">
-          <p>Scan with <strong>Google Pay, PhonePe, Paytm, BHIM</strong></p>
-          <div class="upi-id-row">
-            <span id="upiIdText">7880907106@ybl</span>
-            <button class="btn-copy-upi" onclick="copyUpiId()">Copy UPI</button>
-          </div>
+      <!-- Support / Buy Me Coffee -->
+      <div class="plan plan--featured">
+        <div class="plan__badge">100% Optional</div>
+        <div class="plan__name">Buy Me a Coffee ☕</div>
+        <div class="plan__price"><strong>₹50 - ₹500</strong><span> / any amount</span></div>
+        <div class="plan__note">Help us keep PostCraft AI 100% Free for everyone!</div>
+        <ul class="plan__features">
+          <li class="yes">Keeps servers running fast</li>
+          <li class="yes">Supports open-source free AI tools</li>
+          <li class="yes">Instant UPI transfer (GPay/PhonePe/Paytm)</li>
+        </ul>
+        <div class="upi-box" style="margin-top:14px;padding:12px">
+          <img id="coffeeQrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=upi://pay?pa=7880907106@ybl%26pn=PostCraftSupport%26cu=INR" alt="UPI QR Code" style="width:120px;height:120px;background:#fff;padding:6px;border-radius:8px" />
+          <p style="font-size:0.75rem;color:var(--t2);margin-top:6px">UPI: <strong>7880907106@ybl</strong></p>
         </div>
       </div>
 
-      <!-- Transaction UTR Verification -->
-      <div class="utr-group">
-        <input type="text" id="utrInput" class="field__textarea" style="min-height:auto;padding:10px" placeholder="Enter 12-digit UPI Ref / UTR No. after payment" maxLength="12" />
-        <button class="btn btn--primary btn--full" style="margin-top:8px" onclick="verifyUpiPayment()">Verify &amp; Unlock Pro ✦</button>
+      <!-- High-Ticket Consulting / Profile Rewrite -->
+      <div class="plan">
+        <div class="plan__name">LinkedIn Profile Optimization 💼</div>
+        <div class="plan__price"><strong>₹1,499</strong><span> / one-time</span></div>
+        <div class="plan__note">High-converting personal branding package</div>
+        <ul class="plan__features">
+          <li class="yes">Complete Headline &amp; About Section Rewrite</li>
+          <li class="yes">Custom Banner Design guidance</li>
+          <li class="yes">SEO keyword optimization for job/client leads</li>
+          <li class="yes">1-on-1 strategy audit call</li>
+        </ul>
+        <a href="https://wa.me/917880907106?text=Hi!%20I%20want%20LinkedIn%20Profile%20Optimization%20Service" target="_blank" rel="noopener noreferrer" class="btn btn--primary btn--full" style="text-decoration:none;margin-top:auto">
+          Book Audit on WhatsApp →
+        </a>
       </div>
-    </div>
 
-    <!-- TAB 2: CASHFREE / PAYMENT LINK (FREE SIGNUP GATEWAY) -->
-    <div class="pay-panel" id="panelGateway" style="display:none">
-      <p class="modal__sub" style="margin-bottom:14px;font-size:0.8rem">Pay using Credit/Debit Cards, Netbanking, or Cashfree</p>
-      <a href="https://cashfree.com" id="cashfreePayBtn" target="_blank" rel="noopener noreferrer" class="btn btn--rzp btn--full" style="background:linear-gradient(135deg, #10B981, #059669);border-color:#34D399;text-decoration:none">
-        💳 Pay via Cashfree / Gateway →
-      </a>
     </div>
-
-    <div class="modal-trust" style="margin-top:14px">
-      <span>🔒 100% Secure</span>
-      <span>·</span>
-      <span>Instant Pro Activation</span>
-      <span>·</span>
-      <span>0 Signup Fees</span>
-    </div>
-    <button class="modal__skip" onclick="hideUpgradeModal()">Maybe later</button>
   </div>
-</div>
+</section>
 
 <!-- ══ TOAST ════════════════════════════════════════════ -->
 <div class="toast" id="toast" role="alert" style="display:none"></div>
@@ -385,9 +342,10 @@
     <nav class="footer__nav">
       <a href="#generator">Generator</a>
       <a href="#templates">Templates</a>
-      <a href="#pricing">Pricing</a>
+      <a href="#tools">Growth Tools</a>
+      <a href="#support">Support Us</a>
     </nav>
-    <p>© 2025 PostCraft AI · All rights reserved</p>
+    <p>© 2025 PostCraft AI · 100% Free AI Tool for Everyone</p>
   </div>
 </footer>
 
