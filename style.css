@@ -254,32 +254,47 @@ body {
 /* LEFT */
 .gen-left { display: flex; flex-direction: column; gap: 18px; }
 
-.field { display: flex; flex-direction: column; gap: 7px; }
-.field__label {
-  font-size: .8rem; font-weight: 600; color: var(--t2); letter-spacing: .02em;
-}
+.field-grp { display: flex; flex-direction: column; gap: 7px; width: 100%; }
+.lbl { font-size: .8rem; font-weight: 600; color: var(--t2); letter-spacing: .02em; }
+.field-row { display: flex; gap: 12px; width: 100%; }
+.flex-1 { flex: 1; }
 
+.inp,
+.ta,
+.sel,
 .field__textarea,
 .field__select {
-  background: var(--s2); color: var(--t1);
-  border: 1px solid var(--border2); border-radius: var(--r-md);
-  padding: 11px 13px; font-family: 'DM Sans', sans-serif; font-size: .88rem;
-  width: 100%; outline: none;
-  transition: border-color .15s var(--ease), box-shadow .15s var(--ease);
+  background: var(--s2) !important; color: var(--t1) !important;
+  border: 1px solid var(--border2) !important; border-radius: var(--r-md) !important;
+  padding: 11px 13px !important; font-family: 'DM Sans', sans-serif !important; font-size: .88rem !important;
+  width: 100% !important; box-sizing: border-box !important; outline: none !important;
+  transition: border-color .15s var(--ease), box-shadow .15s var(--ease) !important;
 }
+.inp:focus,
+.ta:focus,
+.sel:focus,
 .field__textarea:focus,
 .field__select:focus {
-  border-color: var(--blue); box-shadow: 0 0 0 3px rgba(10,132,255,.14);
+  border-color: var(--blue) !important; box-shadow: 0 0 0 3px rgba(10,132,255,.18) !important;
 }
-.field__textarea::placeholder { color: var(--t3); }
+.inp::placeholder,
+.ta::placeholder,
+.field__textarea::placeholder { color: var(--t3) !important; }
+.ta,
 .field__textarea { resize: vertical; min-height: 96px; line-height: 1.55; }
+.sel,
 .field__select {
-  appearance: none; cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238B8B96' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 13px center; padding-right: 34px;
+  appearance: none !important; -webkit-appearance: none !important; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238B8B96' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important; background-position: right 13px center !important; padding-right: 34px !important;
 }
-.field__select option { background: var(--s2); }
+.sel option,
+.field__select option { background: #131626 !important; color: #F0F0F5 !important; }
+.ta-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+.hint { font-size: .72rem; color: var(--t3); }
+.counter,
 .char-count { font-size: .72rem; color: var(--t3); text-align: right; }
+
 
 /* Style chips */
 .chips { display: grid; grid-template-columns: repeat(3,1fr); gap: 7px; }
@@ -622,7 +637,66 @@ body {
 }
 
 
+/* ══ SUPPORT SECTION ═══════════════════════════════ */
+.support-section { padding: 60px 0 20px; }
+.support-card {
+  background: linear-gradient(135deg, rgba(13,15,26,0.95), rgba(19,22,38,0.95));
+  border: 1px solid var(--border2);
+  border-radius: var(--r-xl);
+  padding: 36px 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 32px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  position: relative; overflow: hidden;
+}
+.support-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--blue), var(--purple), var(--green));
+}
+.support-card__left { flex: 1; }
+.support-card__left h2 { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; margin-bottom: 10px; color: var(--t1); }
+.support-card__left p { color: var(--t2); font-size: .92rem; line-height: 1.6; margin-bottom: 20px; max-width: 540px; }
+.upi-box {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--s3); border: 1px solid rgba(10,132,255,0.3);
+  padding: 8px 16px; border-radius: var(--r-full);
+}
+.upi-lbl { font-size: .78rem; font-weight: 700; color: var(--t2); text-transform: uppercase; letter-spacing: .05em; }
+.upi-val { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--blue); letter-spacing: .02em; }
+.btn-copy-upi {
+  background: rgba(10,132,255,.2); color: #60AAFF; border: none;
+  padding: 4px 10px; border-radius: var(--r-full); font-size: .72rem;
+  font-weight: 700; cursor: pointer; transition: background .15s; margin-left: 4px;
+}
+.btn-copy-upi:hover { background: rgba(10,132,255,.4); }
+
+.support-card__right { display: flex; align-items: center; flex-shrink: 0; }
+.btn--whatsapp {
+  background: linear-gradient(135deg, #25D366, #128C7E) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 24px rgba(37,211,102,.35) !important;
+  padding: 14px 28px !important;
+  border-radius: var(--r-xl) !important;
+  font-size: .95rem !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  display: inline-flex !important; align-items: center !important; gap: 8px !important;
+}
+.btn--whatsapp:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 32px rgba(37,211,102,.5) !important;
+}
+
+@media(max-width:768px) {
+  .support-card { flex-direction: column; text-align: center; padding: 28px 20px; gap: 20px; }
+  .support-card__left p { margin-left: auto; margin-right: auto; }
+  .support-card__right { width: 100%; justify-content: center; }
+  .btn--whatsapp { width: 100%; justify-content: center; }
+  .upi-box { flex-wrap: wrap; justify-content: center; }
+}
+
 .footer { border-top: 1px solid var(--border); padding: 44px 0 28px; }
+
 .footer__inner { display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center; }
 .footer__logo { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; }
 .footer__logo em { font-style: normal; color: var(--blue); }
