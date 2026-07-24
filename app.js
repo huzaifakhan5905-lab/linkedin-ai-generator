@@ -1372,16 +1372,28 @@ async function copyText(elId) {
    SMART API CALL
 ══════════════════════════════════════════ */
 async function callAPI(payload) {
-  // Always use serverless (Gap #2: no client-side key)
   const res = await fetch('/api/generate', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(payload),
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
   });
-  const data = await res.json();
-  if (!res.ok || !data.success) throw new Error(data.error||'API error');
+
+  const rawText = await res.text();
+  let data;
+  try {
+    data = JSON.parse(rawText);
+  } catch (e) {
+    console.error('API Non-JSON response:', rawText);
+    throw new Error(`Server error (${res.status}): Try again in a few seconds.`);
+  }
+
+  if (!res.ok || data.error) {
+    throw new Error(data.error || `Server error (${res.status})`);
+  }
+
   return data;
 }
+
 
 /* ══════════════════════════════════════════
    TOOL TABS SWITCHER

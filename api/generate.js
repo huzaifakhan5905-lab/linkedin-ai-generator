@@ -3,12 +3,15 @@
 //        headline, about, calendar, analyze, hashtags, transform, repurpose, dm
 
 const MODELS = [
-  'google/gemini-2.0-flash-exp:free',
+  'meta-llama/llama-3.3-70b-instruct:free',
+  'google/gemini-2.0-flash-lite-preview-02-05:free',
   'meta-llama/llama-3.1-8b-instruct:free',
-  'inclusionai/ling-3.0-flash:free',
-  'deepseek/deepseek-r1:free',
+  'google/gemini-2.0-flash-exp:free',
   'qwen/qwen-2.5-coder-32b-instruct:free',
+  'mistralai/mistral-7b-instruct:free',
+  'deepseek/deepseek-r1:free',
 ];
+
 
 const STYLE_PROMPTS = {
   storytelling: 'Write as a personal narrative with beginning, tension, and payoff. Short paragraphs. Make it feel human.',
