@@ -118,7 +118,7 @@ const TEMPLATES = [
 ];
 
 /* ══ STATE ══ */
-const S = { style:'storytelling', post:'', inputMode:'topic' };
+const S = { style:'storytelling', post:'', inputMode:'topic', topicText:'', urlText:'' };
 
 /* ══════════════════════════════════════════
    INIT
@@ -144,19 +144,38 @@ function handleHashNav() {
   }, 100);
 }
 
-/* ── INPUT MODE ── */
+/* ── INPUT MODE (SEPARATE DRAFTS & CLEAR SWITCHING) ── */
 function switchInputMode(mode) {
+  const ta = document.getElementById('topicInput');
+  const cc = document.getElementById('charCount');
+  
+  // Save current text to corresponding mode draft
+  if (ta) {
+    if (S.inputMode === 'topic') {
+      S.topicText = ta.value;
+    } else {
+      S.urlText = ta.value;
+    }
+  }
+
   S.inputMode = mode;
   const isTopic = mode === 'topic';
   document.getElementById('tabModeTopic')?.classList.toggle('pay-tab--active', isTopic);
   document.getElementById('tabModeUrl')?.classList.toggle('pay-tab--active', !isTopic);
   const lbl = document.getElementById('inputLabel');
-  const ta  = document.getElementById('topicInput');
+  
   if (lbl) lbl.textContent = isTopic ? 'What do you want to post about?' : 'Paste YouTube Video or Web Article URL:';
-  if (ta)  ta.placeholder  = isTopic
-    ? "e.g. 'I got promoted after 3 years...' or 'Hot take on remote work'"
-    : "e.g. 'https://youtube.com/watch?v=...' or 'https://medium.com/article-slug'";
+  if (ta) {
+    ta.placeholder = isTopic
+      ? "e.g. 'I got promoted after 3 years...' or 'Hot take on remote work'"
+      : "e.g. 'https://youtube.com/watch?v=...' or 'https://medium.com/article-slug'";
+    
+    // Switch to selected mode's saved text
+    ta.value = isTopic ? (S.topicText || '') : (S.urlText || '');
+    if (cc) cc.textContent = `${ta.value.length} / 500`;
+  }
 }
+
 
 /* ── CREATOR PRESET ── */
 function selectCreatorStyle(key) {
@@ -258,8 +277,18 @@ function closeOnboarding() {
 ══════════════════════════════════════════ */
 async function generatePost() {
   const topic = document.getElementById('topicInput')?.value?.trim();
-  if (!topic || topic.length < 3) { toast('⚠️ Please enter your topic or URL','err'); return; }
-  if (S.inputMode==='url' && !isValidUrl(topic)) { toast('⚠️ Please enter a valid URL (https://)','err'); return; }
+  
+  if (S.inputMode === 'url') {
+    if (!topic || !isValidUrl(topic)) {
+      toast('⚠️ Invalid URL! Link must start with https:// or http:// (e.g., https://youtube.com/...) or switch to Topic Mode', 'err');
+      return;
+    }
+  } else {
+    if (!topic || topic.length < 3) {
+      toast('⚠️ Please enter your topic before generating', 'err');
+      return;
+    }
+  }
 
   const tone       = document.getElementById('toneSelect')?.value||'casual';
   const lang       = document.getElementById('langSelect')?.value||'hinglish';
@@ -274,7 +303,7 @@ async function generatePost() {
     const data = await callAPI({ mode:'post', topic, style:S.style, tone, lang, length, cta, useEmoji, useHashtag, useHook, inputMode:S.inputMode });
 
     // Gap #3: Show feedback if URL fetch failed
-    if (data.urlFetchFailed) toast('⚠️ URL se content nahi mila — topic mode mein generate kiya','warn');
+    if (data.urlFetchFailed) toast('⚠️ URL content unreachable — generated using link topic','warn');
     S.post = data.post;
     renderResult(data.post);
     saveToHistory(data.post);
@@ -291,12 +320,23 @@ async function generatePost() {
 ══════════════════════════════════════════ */
 async function generateVariations() {
   const topic = document.getElementById('topicInput')?.value?.trim();
-  if (!topic || topic.length < 3) { toast('⚠️ Please enter your topic first','err'); return; }
-  if (S.inputMode==='url' && !isValidUrl(topic)) { toast('⚠️ Please enter a valid URL','err'); return; }
+  
+  if (S.inputMode === 'url') {
+    if (!topic || !isValidUrl(topic)) {
+      toast('⚠️ Invalid URL! Link must start with https:// or http:// (e.g., https://youtube.com/...)', 'err');
+      return;
+    }
+  } else {
+    if (!topic || topic.length < 3) {
+      toast('⚠️ Please enter your topic first', 'err');
+      return;
+    }
+  }
 
   const tone       = document.getElementById('toneSelect')?.value||'casual';
   const useEmoji   = document.getElementById('useEmoji')?.checked??true;
   const useHashtag = document.getElementById('useHashtag')?.checked??true;
+
 
   setBusy(true,'variationsBtn','varBtnText',null,'varSpinner','Generating 3 versions...');
   try {
