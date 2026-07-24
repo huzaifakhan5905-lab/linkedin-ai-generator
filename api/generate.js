@@ -85,14 +85,16 @@ Output ONLY the post. No labels, no meta text.`;
 
   for (const model of MODELS) {
     try {
+      // Create fresh headers object for each request to prevent any header mutation/append accumulation
+      const reqHeaders = new Headers();
+      reqHeaders.set('Authorization', `Bearer ${apiKey}`);
+      reqHeaders.set('Content-Type', 'application/json');
+      reqHeaders.set('HTTP-Referer', 'https://postcraft.ai');
+      reqHeaders.set('X-Title', 'PostCraft AI');
+
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://postcraft.ai',
-          'X-Title': 'PostCraft AI',
-        },
+        headers: reqHeaders,
         body: JSON.stringify({
           model: model,
           messages: [
