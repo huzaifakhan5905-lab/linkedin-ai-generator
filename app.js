@@ -339,7 +339,64 @@ function closeCarouselModal() {
 }
 
 function printCarouselPdf() {
-  window.print();
+  // Get slide data from existing preview container
+  const slides = document.querySelectorAll('#carouselSlidesContainer .carousel-slide');
+  if (!slides.length) return;
+
+  // Build structured slide data
+  const slideData = [];
+  slides.forEach((slide, idx) => {
+    const num  = slide.querySelector('.carousel-slide__num')?.textContent || `Slide ${idx + 1}`;
+    const text = slide.querySelector('.carousel-slide__text')?.textContent || '';
+    slideData.push({ num, text, index: idx + 1, total: slides.length });
+  });
+
+  // Remove any stale print area
+  const old = document.getElementById('carouselPrintArea');
+  if (old) old.remove();
+
+  // Create print-only container
+  const printArea = document.createElement('div');
+  printArea.id = 'carouselPrintArea';
+  printArea.style.cssText = 'display:none;';
+
+  const colors = [
+    'linear-gradient(135deg,#0A1628 0%,#0D1533 100%)',
+    'linear-gradient(135deg,#100E2A 0%,#1A1050 100%)',
+    'linear-gradient(135deg,#0A2010 0%,#0F2E18 100%)',
+    'linear-gradient(135deg,#1A0A28 0%,#2A0E40 100%)',
+    'linear-gradient(135deg,#1A1400 0%,#2A2000 100%)',
+  ];
+  const accents = ['#0A84FF','#A78BFA','#30D158','#C084FC','#F5A623'];
+
+  slideData.forEach((slide, i) => {
+    const bg     = colors[i % colors.length];
+    const accent = accents[i % accents.length];
+
+    const div = document.createElement('div');
+    div.className = 'carousel-print-slide';
+    div.style.cssText = `background:${bg};`;
+    div.innerHTML = `
+      <div class="carousel-print-slide__brand" style="color:${accent}">PostCraft AI</div>
+      <div class="carousel-print-slide__number" style="color:${accent}80">${slide.num}</div>
+      <div class="carousel-print-slide__text">${esc(slide.text)}</div>
+      <div class="carousel-print-slide__footer">
+        <span class="carousel-print-slide__logo">PostCraft AI · Free LinkedIn Generator</span>
+      </div>
+    `;
+    printArea.appendChild(div);
+  });
+
+  document.body.appendChild(printArea);
+
+  // Print then clean up
+  setTimeout(() => {
+    window.print();
+    setTimeout(() => {
+      const area = document.getElementById('carouselPrintArea');
+      if (area) area.remove();
+    }, 1500);
+  }, 80);
 }
 
 /* ── SCORES & COPY ───────────────────────────────────── */

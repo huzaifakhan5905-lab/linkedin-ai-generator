@@ -540,23 +540,80 @@ body {
   scroll-snap-type: x mandatory; max-width: 100%;
 }
 .carousel-slide {
-  flex: 0 0 240px; height: 300px; background: linear-gradient(135deg, #131626 0%, #0D0F1A 100%);
-  border: 1px solid var(--blue); border-radius: var(--r-lg); padding: 20px;
+  flex: 0 0 240px; height: 300px;
+  background: linear-gradient(135deg, #0a84ff18 0%, #5e5ce618 100%);
+  border: 1.5px solid var(--blue); border-radius: var(--r-lg); padding: 22px 20px;
   display: flex; flex-direction: column; justify-content: space-between;
-  scroll-snap-align: center; box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  scroll-snap-align: center; box-shadow: 0 8px 28px rgba(10,132,255,.18);
   font-family: 'DM Sans', sans-serif; position: relative; text-align: left;
+  transition: transform .18s var(--ease), box-shadow .18s var(--ease);
+}
+.carousel-slide:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 36px rgba(10,132,255,.28);
 }
 .carousel-slide__num {
-  font-family: 'Syne', sans-serif; font-size: .75rem; font-weight: 800;
-  color: var(--blue); letter-spacing: .08em; text-transform: uppercase;
+  font-family: 'Syne', sans-serif; font-size: .72rem; font-weight: 800;
+  color: var(--blue); letter-spacing: .1em; text-transform: uppercase;
+  background: rgba(10,132,255,.12); padding: 2px 8px; border-radius: var(--r-full);
+  display: inline-block; margin-bottom: 4px;
 }
 .carousel-slide__text {
-  font-size: .84rem; color: var(--t1); line-height: 1.55; word-break: break-word;
-  font-weight: 500;
+  font-size: .85rem; color: var(--t1); line-height: 1.58; word-break: break-word;
+  font-weight: 500; flex: 1; margin: 10px 0;
 }
 .carousel-slide__foot {
   display: flex; align-items: center; justify-content: space-between;
-  border-top: 1px solid var(--border); padding-top: 10px; font-size: .7rem; color: var(--t2);
+  border-top: 1px solid var(--border); padding-top: 8px; font-size: .68rem; color: var(--t2);
+}
+
+/* ── PRINT / PDF EXPORT (Carousel Only) ── */
+@media print {
+  /* Hide everything except the carousel print wrapper */
+  body > *:not(#carouselPrintArea) { display: none !important; }
+  #carouselPrintArea {
+    display: block !important;
+    position: fixed; inset: 0; z-index: 99999;
+    background: #fff;
+  }
+  .carousel-print-slide {
+    width: 100vw; height: 100vh;
+    page-break-after: always;
+    break-after: page;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px;
+    background: linear-gradient(135deg, #0A1628 0%, #0D1533 100%);
+    box-sizing: border-box;
+    text-align: center;
+    font-family: 'DM Sans', sans-serif;
+    color: #fff;
+  }
+  .carousel-print-slide__brand {
+    font-size: 11pt; font-weight: 700; color: #0A84FF;
+    letter-spacing: .12em; text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .carousel-print-slide__number {
+    font-size: 9pt; font-weight: 800; color: rgba(10,132,255,.7);
+    letter-spacing: .15em; text-transform: uppercase; margin-bottom: 16px;
+  }
+  .carousel-print-slide__text {
+    font-size: 18pt; line-height: 1.6; font-weight: 500;
+    color: #fff; max-width: 480pt;
+  }
+  .carousel-print-slide__footer {
+    margin-top: 40px; font-size: 10pt; color: rgba(255,255,255,.4);
+  }
+  .carousel-print-slide__logo {
+    font-size: 10pt; color: rgba(255,255,255,.35); font-weight: 600;
+  }
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
 }
 
 
