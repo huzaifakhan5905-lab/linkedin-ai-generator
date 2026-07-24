@@ -123,7 +123,7 @@
           </div>
         </div>
 
-        <!-- TONE & TOGGLES -->
+        <!-- TONE, LANGUAGE, LENGTH & CTA -->
         <div class="field-row">
           <div class="field-grp flex-1">
             <label class="lbl" for="toneSelect">Tone of Voice</label>
@@ -136,7 +136,37 @@
               <option value="humorous">😄 Witty &amp; Clever</option>
             </select>
           </div>
+          <div class="field-grp flex-1">
+            <label class="lbl" for="langSelect">Language</label>
+            <select id="langSelect" class="sel">
+              <option value="english">🌐 English</option>
+              <option value="hinglish" selected>🇮🇳 Hinglish (Hindi + English)</option>
+              <option value="hindi">📜 Pure Hindi</option>
+            </select>
+          </div>
         </div>
+
+        <div class="field-row">
+          <div class="field-grp flex-1">
+            <label class="lbl" for="lengthSelect">Post Length</label>
+            <select id="lengthSelect" class="sel">
+              <option value="medium" selected>📝 Medium (150-250 words)</option>
+              <option value="short">⚡ Short &amp; Punchy (50-90 words)</option>
+              <option value="detailed">📜 Detailed Breakdown (280-400 words)</option>
+            </select>
+          </div>
+          <div class="field-grp flex-1">
+            <label class="lbl" for="ctaSelect">Call To Action (CTA)</label>
+            <select id="ctaSelect" class="sel">
+              <option value="question" selected>❓ Thought-provoking Question</option>
+              <option value="comment">💬 Comment Keyword (e.g. 'GUIDE')</option>
+              <option value="repost">🔁 Repost &amp; Share with Network</option>
+              <option value="dm">📩 Send Direct Message (DM)</option>
+              <option value="follow">➕ Follow for More Insights</option>
+            </select>
+          </div>
+        </div>
+
 
         <div class="toggles">
           <label class="tog-lbl"><input type="checkbox" id="useHook" checked /> ⚡ Scroll-stopping Hook</label>

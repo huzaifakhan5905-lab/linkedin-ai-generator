@@ -96,9 +96,39 @@ async function fetchUrlContent(url) {
 /* ══════════════════════════════════════════
    PROMPT BUILDERS
 ══════════════════════════════════════════ */
-function buildPostPrompt({ content, urlType, urlMeta, style, tone, useEmoji, useHashtag, useHook }) {
+function buildPostPrompt({ content, urlType, urlMeta, style, tone, useEmoji, useHashtag, useHook, lang, length, cta }) {
   const sty = STYLE_PROMPTS[style] || STYLE_PROMPTS.storytelling;
   const ton = TONE_PROMPTS[tone] || TONE_PROMPTS.casual;
+
+  let langInst = '';
+  if (lang === 'hinglish') {
+    langInst = 'LANGUAGE: Conversational Hinglish (Hindi words written in Roman English script mixed with English). E.g. "Aaj maine ye seekha", "Yeh mistake bilkul mat karna". Make it super natural for Indian professional audience.';
+  } else if (lang === 'hindi') {
+    langInst = 'LANGUAGE: Clean Hindi written in Devanagari script. Polite, professional, and clear Hindi.';
+  } else {
+    langInst = 'LANGUAGE: Professional English.';
+  }
+
+  let lenInst = 'RULES: Short paragraphs (2-3 sentences max). 150-280 words.';
+  if (length === 'short') {
+    lenInst = 'RULES: Ultra-concise short post (50-90 words max). 3-5 lines max. Extremely punchy.';
+  } else if (length === 'detailed') {
+    lenInst = 'RULES: Detailed long-form breakdown (280-400 words). Deep insights with subheadings or bullet points.';
+  }
+
+  let ctaInst = '';
+  if (cta === 'question') {
+    ctaInst = 'CTA: End with a genuinely thought-provoking open question to drive comments.';
+  } else if (cta === 'comment') {
+    ctaInst = 'CTA: End by asking readers to comment a specific keyword (e.g. "Comment \'GUIDE\' and I will send you the PDF").';
+  } else if (cta === 'repost') {
+    ctaInst = 'CTA: End with a clear request to Repost & Share with their network if they found it valuable.';
+  } else if (cta === 'dm') {
+    ctaInst = 'CTA: End by asking readers to send a direct message (DM) for details.';
+  } else if (cta === 'follow') {
+    ctaInst = 'CTA: End with "Follow for more insights on this topic".';
+  }
+
   let src;
   if (urlType === 'youtube') {
     src = `YOUTUBE VIDEO: "${urlMeta.title}" by ${urlMeta.channel}\nINSTRUCTION: Write a viral LinkedIn post sharing key insights from this video. Imagine you just watched it.`;
@@ -107,8 +137,10 @@ function buildPostPrompt({ content, urlType, urlMeta, style, tone, useEmoji, use
   } else {
     src = `TOPIC: "${content}"`;
   }
-  return `You are an elite LinkedIn content strategist.\n\n${src}\n\nSTYLE: ${sty}\n${ton}\n${useHook?'HOOK: First line MUST stop the scroll. Never start with "I".':''}\n${useEmoji?'Use 2-4 emojis naturally.':'NO emojis.'}\n${useHashtag?'End with 3-5 hashtags.':'NO hashtags.'}\n\nRULES: Short paragraphs (2-3 sentences max). 150-280 words. NEVER use "In today\'s world", "excited to share", "game-changer". End with question or CTA.\n\nOutput ONLY the post.`;
+
+  return `You are an elite LinkedIn content strategist.\n\n${src}\n\nSTYLE: ${sty}\n${ton}\n${langInst}\n${useHook ? 'HOOK: First line MUST stop the scroll. Never start with "I".' : ''}\n${useEmoji ? 'Use 2-4 emojis naturally.' : 'NO emojis.'}\n${useHashtag ? 'End with 3-5 hashtags.' : 'NO hashtags.'}\n\n${lenInst}\n${ctaInst}\n\nNEVER use "In today\'s world", "excited to share", "game-changer". Output ONLY the post.`;
 }
+
 
 function buildVariationsPrompt({ content, isUrl, tone, useEmoji, useHashtag }) {
   return `Generate 3 DIFFERENT LinkedIn post variations for: ${isUrl?`SOURCE: "${content}"`:`TOPIC: "${content}"`}\n\nVariation 1: Personal Story style\nVariation 2: Bold Hot Take style\nVariation 3: Numbered List style\n\n${TONE_PROMPTS[tone]||TONE_PROMPTS.casual}\n${useEmoji?'2-3 emojis per post.':'NO emojis.'}\n${useHashtag?'3-5 hashtags each.':'NO hashtags.'}\n150-280 words each. Strong hook. End with CTA.\n\n---VARIATION 1---\n[post]\n---VARIATION 2---\n[post]\n---VARIATION 3---\n[post]`;
@@ -223,11 +255,11 @@ export default async function handler(req, res) {
   const apiKey = (process.env.OPENROUTER_API_KEY || '').trim();
   if (!apiKey) return res.status(500).json({ error: 'OPENROUTER_API_KEY not configured on server.' });
 
-  const body = req.body || {};
   const { mode='post', topic, style, tone, useEmoji, useHashtag, useHook, inputMode,
           postContent, name, role, reason, company, purpose, context,
           currentRole, experience, skills, achievements, targetAudience, goal, superpower, targetRole,
-          industry, post, sourceType } = body;
+          industry, post, sourceType, lang, length, cta } = body;
+
 
   try {
     // ── COMMENT
@@ -333,8 +365,9 @@ export default async function handler(req, res) {
     }
 
     // ── SINGLE POST
-    const { text, model } = await callAI(apiKey, buildPostPrompt({ content: content.slice(0,2000), urlType, urlMeta, style, tone, useEmoji, useHashtag, useHook }), 650);
+    const { text, model } = await callAI(apiKey, buildPostPrompt({ content: content.slice(0,2000), urlType, urlMeta, style, tone, useEmoji, useHashtag, useHook, lang, length, cta }), 650);
     return res.status(200).json({ success:true, post:text, modelUsed:model, urlType, urlFetchFailed });
+
 
   } catch (err) {
     console.error('Handler error:', err.message);

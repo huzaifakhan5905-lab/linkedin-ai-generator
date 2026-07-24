@@ -182,16 +182,26 @@ function initChips() {
   });
 }
 
-/* ── TEXTAREA COUNTER ── */
+/* ── TEXTAREA COUNTER & DRAFT AUTO-SAVE ── */
 function initTextareaCounter() {
   const ta = document.getElementById('topicInput');
   const cc = document.getElementById('charCount');
   if (!ta || !cc) return;
+
+  // Restore saved draft if exists
+  const saved = localStorage.getItem('postcraft_draft_topic');
+  if (saved && !ta.value) {
+    ta.value = saved;
+    cc.textContent = `${saved.length} / 500`;
+  }
+
   ta.addEventListener('input', () => {
     if (ta.value.length > 500) ta.value = ta.value.slice(0,500);
     cc.textContent = `${ta.value.length} / 500`;
+    localStorage.setItem('postcraft_draft_topic', ta.value);
   });
 }
+
 
 /* ── TEMPLATES ── */
 function renderTemplates() {
@@ -252,13 +262,17 @@ async function generatePost() {
   if (S.inputMode==='url' && !isValidUrl(topic)) { toast('⚠️ Please enter a valid URL (https://)','err'); return; }
 
   const tone       = document.getElementById('toneSelect')?.value||'casual';
+  const lang       = document.getElementById('langSelect')?.value||'hinglish';
+  const length     = document.getElementById('lengthSelect')?.value||'medium';
+  const cta        = document.getElementById('ctaSelect')?.value||'question';
   const useEmoji   = document.getElementById('useEmoji')?.checked??true;
   const useHashtag = document.getElementById('useHashtag')?.checked??true;
   const useHook    = document.getElementById('useHook')?.checked??true;
 
   setBusy(true,'generateBtn','genBtnText','genBtnIcon','spinner','Generating...');
   try {
-    const data = await callAPI({ mode:'post', topic, style:S.style, tone, useEmoji, useHashtag, useHook, inputMode:S.inputMode });
+    const data = await callAPI({ mode:'post', topic, style:S.style, tone, lang, length, cta, useEmoji, useHashtag, useHook, inputMode:S.inputMode });
+
     // Gap #3: Show feedback if URL fetch failed
     if (data.urlFetchFailed) toast('⚠️ URL se content nahi mila — topic mode mein generate kiya','warn');
     S.post = data.post;
@@ -711,6 +725,11 @@ function renderAnalysis(raw) {
       <strong>⚠️ Top Issues:</strong>
       ${issues.map(i=>`<span class="issue-tag">${esc(i)}</span>`).join('')}
     </div>
+
+    <div style="margin-bottom:14px">
+      <button class="btn btn--ghost btn--sm" onclick="downloadScoreCardImage(${hookScore}, ${readScore}, ${engScore})">🖼️ Download Shareable Score Card PNG</button>
+    </div>
+
     ${improved ? `<div class="result-card" style="margin-top:16px">
       <div class="result-card__num">✨ Improved Version</div>
       <div class="result-card__text" id="improved-post" style="white-space:pre-wrap">${esc(improved)}</div>
@@ -723,6 +742,66 @@ function renderAnalysis(raw) {
   document.getElementById('analyzeEmpty').style.display='none';
   window._improvedPost = improved;
 }
+
+/* ══ SHAREABLE VIRAL POST SCORE CARD GENERATOR ══ */
+function downloadScoreCardImage(hookScore, readScore, engScore) {
+  const overall = Math.round((hookScore + readScore + engScore) / 3);
+  const W = 1200, H = 630;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Background
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, '#0F172A');
+  grad.addColorStop(1, '#020617');
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+
+  // Border Frame
+  ctx.strokeStyle = '#0A84FF'; ctx.lineWidth = 4;
+  ctx.strokeRect(30, 30, W - 60, H - 60);
+
+  // Header
+  ctx.fillStyle = '#0A84FF'; ctx.font = 'bold 22px sans-serif';
+  ctx.fillText('POSTCRAFT AI  ✦  VIRAL POST AUDIT REPORT', 70, 90);
+
+  // Overall Score Circle / Text
+  ctx.fillStyle = '#FFFFFF'; ctx.font = 'bold 72px sans-serif';
+  ctx.fillText(`${overall}/100`, 70, 200);
+  ctx.fillStyle = overall >= 80 ? '#30D158' : overall >= 60 ? '#F5A623' : '#FF453A';
+  ctx.font = 'bold 24px sans-serif';
+  ctx.fillText(overall >= 80 ? '🔥 High Viral Potential' : overall >= 60 ? '⚡ Good Quality' : '⚠️ Needs Hook Optimization', 70, 240);
+
+  // 3 Score Columns
+  const drawStat = (label, val, x) => {
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.fillRect(x, 290, 320, 160);
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 1;
+    ctx.strokeRect(x, 290, 320, 160);
+
+    ctx.fillStyle = '#A0AEC0'; ctx.font = '18px sans-serif';
+    ctx.fillText(label, x + 30, 330);
+
+    ctx.fillStyle = '#FFFFFF'; ctx.font = 'bold 48px sans-serif';
+    ctx.fillText(`${val}%`, x + 30, 400);
+  };
+
+  drawStat('Hook Power', hookScore, 70);
+  drawStat('Readability', readScore, 430);
+  drawStat('Engagement', engScore, 790);
+
+  // Footer Branding
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'; ctx.font = '18px sans-serif';
+  ctx.fillText('Analyzed with PostCraft AI  •  generator-seven.vercel.app', 70, H - 65);
+
+  // Trigger Download
+  const a = document.createElement('a');
+  a.download = `postcraft-viral-score-${overall}.png`;
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+  toast('✓ Shareable Score Card PNG downloaded!', 'ok');
+}
+
 
 function useImprovedPost() {
   if (!window._improvedPost) return;
