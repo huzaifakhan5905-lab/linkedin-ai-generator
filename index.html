@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PostCraft AI — LinkedIn Content Generator</title>
+  <meta name="description" content="Generate viral LinkedIn posts in seconds with AI. Grow your personal brand effortlessly." />
+  <meta property="og:title" content="PostCraft AI — LinkedIn Content Generator" />
+  <meta property="og:description" content="AI-powered LinkedIn posts that actually go viral. Try free." />
+  <meta property="og:type" content="website" />
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ambient glow -->
+<div class="ambient" aria-hidden="true">
+  <div class="ambient__blob ambient__blob--1"></div>
+  <div class="ambient__blob ambient__blob--2"></div>
+  <div class="ambient__blob ambient__blob--3"></div>
+</div>
+
+<!-- ══ HEADER ══════════════════════════════════════════ -->
+<header class="header">
+  <div class="container header__inner">
+    <a href="#" class="logo">
+      <div class="logo__mark" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+          <rect width="30" height="30" rx="9" fill="url(#lg)"/>
+          <path d="M8 11h14M8 15h10M8 19h7" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+          <circle cx="21" cy="19" r="3.5" fill="#fff" opacity="0.9"/>
+          <defs>
+            <linearGradient id="lg" x1="0" y1="0" x2="30" y2="30">
+              <stop stop-color="#0A84FF"/>
+              <stop offset="1" stop-color="#5E5CE6"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <span>PostCraft <em>AI</em></span>
+    </a>
+
+    <nav class="header__nav">
+      <a href="#generator">Generate</a>
+      <a href="#templates">Templates</a>
+      <a href="#pricing">Pricing</a>
+    </nav>
+
+    <div class="header__right">
+      <div class="credits-pill" id="creditsPill">
+        <span class="credits-dot" aria-hidden="true"></span>
+        <span id="creditsDisplay">5 free left</span>
+      </div>
+      <button class="btn btn--primary btn--sm" onclick="showUpgradeModal()">
+        Upgrade ✦
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ══ HERO ════════════════════════════════════════════ -->
+<section class="hero" id="hero">
+  <div class="container">
+    <div class="hero__pill">
+      <span class="pulse-dot" aria-hidden="true"></span>
+      AI-Powered · 48,000+ Posts Generated
+    </div>
+    <h1 class="hero__h1">
+      LinkedIn Posts That<br>
+      <span class="grad">Actually Go Viral</span>
+    </h1>
+    <p class="hero__p">
+      Turn your ideas into scroll-stopping LinkedIn content in seconds.
+      Join 2,400+ professionals growing their brand with AI.
+    </p>
+    <div class="hero__stats">
+      <div class="stat"><strong>2,400+</strong><span>Active Users</span></div>
+      <div class="divider-v"></div>
+      <div class="stat"><strong>48K+</strong><span>Posts Made</span></div>
+      <div class="divider-v"></div>
+      <div class="stat"><strong>3.2×</strong><span>More Engagement</span></div>
+    </div>
+    <a href="#generator" class="btn btn--hero">Generate for Free →</a>
+  </div>
+</section>
+
+<!-- ══ GENERATOR ════════════════════════════════════════ -->
+<section class="generator" id="generator">
+  <div class="container">
+    <p class="section-tag">GENERATOR</p>
+    <h2 class="section-h2">Create Your Post</h2>
+
+    <div class="gen-wrap">
+
+      <!-- LEFT: Controls -->
+      <div class="gen-left">
+
+        <!-- Topic -->
+        <div class="field">
+          <label class="field__label" for="topicInput">What do you want to post about?</label>
+          <textarea
+            id="topicInput"
+            class="field__textarea"
+            placeholder="e.g. 'I got promoted after 3 years of grinding...' or 'Hot take on remote work' or '5 lessons from my startup failure'"
+            rows="4"
+          ></textarea>
+          <div class="char-count" id="charCount">0 / 500</div>
+        </div>
+
+        <!-- Style chips -->
+        <div class="field">
+          <label class="field__label">Post Style</label>
+          <div class="chips" id="styleChips" role="radiogroup">
+            <button class="chip chip--on" data-style="storytelling" role="radio" aria-checked="true">📖 Story</button>
+            <button class="chip" data-style="insight"       role="radio" aria-checked="false">💡 Hot Take</button>
+            <button class="chip" data-style="listicle"      role="radio" aria-checked="false">📋 List</button>
+            <button class="chip" data-style="question"      role="radio" aria-checked="false">🙋 Question</button>
+            <button class="chip" data-style="motivational"  role="radio" aria-checked="false">🚀 Inspire</button>
+            <button class="chip" data-style="casestudy"     role="radio" aria-checked="false">📊 Case Study</button>
+          </div>
+        </div>
+
+        <!-- Tone -->
+        <div class="field">
+          <label class="field__label" for="toneSelect">Tone</label>
+          <select id="toneSelect" class="field__select">
+            <option value="casual" selected>Casual &amp; Authentic</option>
+            <option value="professional">Professional &amp; Polished</option>
+            <option value="bold">Bold &amp; Provocative</option>
+            <option value="empathetic">Empathetic &amp; Warm</option>
+            <option value="data-driven">Data-Driven</option>
+            <option value="humorous">Witty &amp; Funny</option>
+          </select>
+        </div>
+
+        <!-- Toggles -->
+        <div class="field">
+          <label class="field__label">Options</label>
+          <div class="toggles">
+            <label class="toggle">
+              <input type="checkbox" id="useEmoji" checked>
+              <span class="toggle__track" aria-hidden="true"></span>
+              <span>Emojis</span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="useHashtag" checked>
+              <span class="toggle__track" aria-hidden="true"></span>
+              <span>Hashtags</span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="useHook" checked>
+              <span class="toggle__track" aria-hidden="true"></span>
+              <span>Strong Hook</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Generate -->
+        <button class="btn btn--generate" id="generateBtn" onclick="generatePost()">
+          <span id="genBtnIcon">✦</span>
+          <span id="genBtnText">Generate Post</span>
+          <span class="spinner" id="spinner" style="display:none" aria-hidden="true"></span>
+        </button>
+        <p class="credits-hint" id="creditsHint">5 free generations remaining today</p>
+      </div>
+
+      <!-- RIGHT: Output -->
+      <div class="gen-right" id="genRight">
+
+        <!-- Empty state -->
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon" aria-hidden="true">✦</div>
+          <p>Your LinkedIn post will appear here</p>
+          <span>Fill in the details on the left and hit Generate</span>
+        </div>
+
+        <!-- Result -->
+        <div class="result" id="result" style="display:none">
+
+          <!-- LinkedIn preview card -->
+          <div class="li-card">
+            <div class="li-card__head">
+              <div class="li-avatar" aria-hidden="true">👤</div>
+              <div>
+                <strong>Your Name</strong>
+                <p>Your Title · 1st</p>
+                <small>Just now · 🌐</small>
+              </div>
+            </div>
+            <div class="li-card__body" id="postPreview"></div>
+            <div class="li-card__foot">
+              <span>👍 ❤️ 💡 <strong id="reactions">—</strong></span>
+              <span><strong id="comments">—</strong> comments</span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="result-actions">
+            <button class="btn btn--ghost btn--sm" id="copyBtn" onclick="copyPost()">📋 Copy</button>
+            <button class="btn btn--ghost btn--sm" onclick="generatePost()">🔄 Regenerate</button>
+            <a id="liShareBtn" href="#" class="btn btn--li btn--sm" target="_blank" rel="noopener">🔗 Post to LinkedIn</a>
+          </div>
+
+          <!-- Quality scores -->
+          <div class="scores">
+            <div class="score-row">
+              <span class="score-lbl">Hook</span>
+              <div class="score-track"><div class="score-fill" id="hookFill"></div></div>
+              <span class="score-num" id="hookNum">—</span>
+            </div>
+            <div class="score-row">
+              <span class="score-lbl">Readability</span>
+              <div class="score-track"><div class="score-fill" id="readFill"></div></div>
+              <span class="score-num" id="readNum">—</span>
+            </div>
+            <div class="score-row">
+              <span class="score-lbl">Engagement</span>
+              <div class="score-track"><div class="score-fill" id="engFill"></div></div>
+              <span class="score-num" id="engNum">—</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ TEMPLATES ════════════════════════════════════════ -->
+<section class="templates" id="templates">
+  <div class="container">
+    <p class="section-tag">TEMPLATES</p>
+    <h2 class="section-h2">Proven Post Formulas</h2>
+    <p class="section-sub">Click any template to instantly fill the generator</p>
+    <div class="templates-grid" id="templatesGrid"></div>
+  </div>
+</section>
+
+<!-- ══ PRICING ══════════════════════════════════════════ -->
+<section class="pricing" id="pricing">
+  <div class="container">
+    <p class="section-tag">PRICING</p>
+    <h2 class="section-h2">Simple, Honest Pricing</h2>
+
+    <div class="plans">
+      <!-- Free -->
+      <div class="plan">
+        <div class="plan__name">Free</div>
+        <div class="plan__price"><strong>₹0</strong><span>/month</span></div>
+        <ul class="plan__features">
+          <li class="yes">5 posts per day</li>
+          <li class="yes">All 6 post styles</li>
+          <li class="yes">All tones &amp; options</li>
+          <li class="no">Unlimited generation</li>
+          <li class="no">Post history</li>
+          <li class="no">Priority AI model</li>
+        </ul>
+        <button class="btn btn--outline btn--full" disabled>Current Plan</button>
+      </div>
+
+      <!-- Pro -->
+      <div class="plan plan--featured">
+        <div class="plan__badge">Most Popular</div>
+        <div class="plan__name">Pro</div>
+        <div class="plan__price"><strong>₹499</strong><span>/month</span></div>
+        <div class="plan__note">~$6/mo · Cancel anytime</div>
+        <ul class="plan__features">
+          <li class="yes">Unlimited posts</li>
+          <li class="yes">Faster AI model</li>
+          <li class="yes">Post history (saved)</li>
+          <li class="yes">Priority support</li>
+          <li class="yes">Post scheduler <em>(soon)</em></li>
+          <li class="yes">Analytics <em>(soon)</em></li>
+        </ul>
+        <button class="btn btn--primary btn--full" onclick="showUpgradeModal('pro')">Get Pro — ₹499/mo</button>
+      </div>
+
+      <!-- Lifetime -->
+      <div class="plan">
+        <div class="plan__name">Lifetime</div>
+        <div class="plan__price"><strong>₹2,999</strong><span>once</span></div>
+        <div class="plan__note">Pay once, use forever</div>
+        <ul class="plan__features">
+          <li class="yes">Everything in Pro</li>
+          <li class="yes">All future features</li>
+          <li class="yes">2 team seats</li>
+          <li class="yes">API access</li>
+          <li class="yes">White-label option</li>
+          <li class="yes">Dedicated support</li>
+        </ul>
+        <button class="btn btn--outline btn--full" onclick="showUpgradeModal('lifetime')">Get Lifetime — ₹2,999</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ UPGRADE MODAL ════════════════════════════════════ -->
+<div class="overlay" id="upgradeOverlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="modalHeading">
+  <div class="modal">
+    <button class="modal__x" onclick="hideUpgradeModal()" aria-label="Close">✕</button>
+    <div class="modal__spark" aria-hidden="true">✦</div>
+    <h3 class="modal__h3" id="modalHeading">Upgrade PostCraft AI</h3>
+    <p class="modal__sub">Choose a plan and pay securely with Razorpay</p>
+
+    <!-- Plan picker -->
+    <div class="modal-plans">
+      <button class="mplan mplan--on" id="mplanPro" onclick="pickPlan('pro')">
+        <div class="mplan__row">
+          <span class="mplan__name">Pro</span>
+          <span class="mplan__tag">Popular</span>
+        </div>
+        <div class="mplan__price"><strong>₹499</strong><span>/mo</span></div>
+        <div class="mplan__desc">Unlimited · Fast AI · History</div>
+      </button>
+      <button class="mplan" id="mplanLifetime" onclick="pickPlan('lifetime')">
+        <div class="mplan__row">
+          <span class="mplan__name">Lifetime</span>
+          <span class="mplan__tag mplan__tag--gold">Best Value</span>
+        </div>
+        <div class="mplan__price"><strong>₹2,999</strong><span>once</span></div>
+        <div class="mplan__desc">Pay once · All features forever</div>
+      </button>
+    </div>
+
+    <!-- Pay button -->
+    <button class="btn btn--rzp btn--full" id="rzpPayBtn" onclick="initiateRazorpay()">
+      <svg width="20" height="14" viewBox="0 0 20 14" fill="none" aria-hidden="true">
+        <path d="M2 12L7 2h3L8.5 6.5H11L15 2h3L10 12H7.5L9 9H6L2 12Z" fill="#00BAF2"/>
+      </svg>
+      Pay with Razorpay
+    </button>
+
+    <div class="modal-trust">
+      <span>🔒 Secured by Razorpay</span>
+      <span>·</span>
+      <span>UPI · Cards · Net Banking</span>
+      <span>·</span>
+      <span>30-day refund</span>
+    </div>
+    <button class="modal__skip" onclick="hideUpgradeModal()">Maybe later</button>
+  </div>
+</div>
+
+<!-- ══ TOAST ════════════════════════════════════════════ -->
+<div class="toast" id="toast" role="alert" style="display:none"></div>
+
+<!-- ══ FOOTER ═══════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container footer__inner">
+    <div class="footer__logo">
+      PostCraft <em>AI</em>
+    </div>
+    <nav class="footer__nav">
+      <a href="#generator">Generator</a>
+      <a href="#templates">Templates</a>
+      <a href="#pricing">Pricing</a>
+    </nav>
+    <p>© 2025 PostCraft AI · All rights reserved</p>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
