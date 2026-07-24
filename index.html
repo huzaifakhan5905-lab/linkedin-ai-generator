@@ -298,13 +298,13 @@
   </div>
 </section>
 
-<!-- ══ UPGRADE MODAL ════════════════════════════════════ -->
+<!-- ══ UPGRADE MODAL (100% FREE SETUP) ══════════════════ -->
 <div class="overlay" id="upgradeOverlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="modalHeading">
   <div class="modal">
     <button class="modal__x" onclick="hideUpgradeModal()" aria-label="Close">✕</button>
     <div class="modal__spark" aria-hidden="true">✦</div>
     <h3 class="modal__h3" id="modalHeading">Upgrade PostCraft AI</h3>
-    <p class="modal__sub">Choose a plan and pay securely with Razorpay</p>
+    <p class="modal__sub">Choose your plan and pay securely</p>
 
     <!-- Plan picker -->
     <div class="modal-plans">
@@ -326,20 +326,48 @@
       </button>
     </div>
 
-    <!-- Pay button -->
-    <button class="btn btn--rzp btn--full" id="rzpPayBtn" onclick="initiateRazorpay()">
-      <svg width="20" height="14" viewBox="0 0 20 14" fill="none" aria-hidden="true">
-        <path d="M2 12L7 2h3L8.5 6.5H11L15 2h3L10 12H7.5L9 9H6L2 12Z" fill="#00BAF2"/>
-      </svg>
-      Pay with Razorpay
-    </button>
+    <!-- Payment Tabs -->
+    <div class="pay-tabs">
+      <button class="pay-tab pay-tab--active" id="tabUpi" onclick="switchPayTab('upi')">⚡ Instant UPI (0% Fee)</button>
+      <button class="pay-tab" id="tabGateway" onclick="switchPayTab('gateway')">💳 Card / Cashfree / Link</button>
+    </div>
 
-    <div class="modal-trust">
-      <span>🔒 Secured by Razorpay</span>
+    <!-- TAB 1: UPI QR CODE (100% ZERO COST & ZERO KYC FEE) -->
+    <div class="pay-panel" id="panelUpi">
+      <div class="upi-box">
+        <div class="qr-wrap">
+          <img id="upiQrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=7880907106@ybl%26pn=PostCraft%26am=499%26cu=INR" alt="UPI QR Code" />
+        </div>
+        <div class="upi-info">
+          <p>Scan with <strong>Google Pay, PhonePe, Paytm, BHIM</strong></p>
+          <div class="upi-id-row">
+            <span id="upiIdText">7880907106@ybl</span>
+            <button class="btn-copy-upi" onclick="copyUpiId()">Copy UPI</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transaction UTR Verification -->
+      <div class="utr-group">
+        <input type="text" id="utrInput" class="field__textarea" style="min-height:auto;padding:10px" placeholder="Enter 12-digit UPI Ref / UTR No. after payment" maxLength="12" />
+        <button class="btn btn--primary btn--full" style="margin-top:8px" onclick="verifyUpiPayment()">Verify &amp; Unlock Pro ✦</button>
+      </div>
+    </div>
+
+    <!-- TAB 2: CASHFREE / PAYMENT LINK (FREE SIGNUP GATEWAY) -->
+    <div class="pay-panel" id="panelGateway" style="display:none">
+      <p class="modal__sub" style="margin-bottom:14px;font-size:0.8rem">Pay using Credit/Debit Cards, Netbanking, or Cashfree</p>
+      <a href="https://cashfree.com" id="cashfreePayBtn" target="_blank" rel="noopener noreferrer" class="btn btn--rzp btn--full" style="background:linear-gradient(135deg, #10B981, #059669);border-color:#34D399;text-decoration:none">
+        💳 Pay via Cashfree / Gateway →
+      </a>
+    </div>
+
+    <div class="modal-trust" style="margin-top:14px">
+      <span>🔒 100% Secure</span>
       <span>·</span>
-      <span>UPI · Cards · Net Banking</span>
+      <span>Instant Pro Activation</span>
       <span>·</span>
-      <span>30-day refund</span>
+      <span>0 Signup Fees</span>
     </div>
     <button class="modal__skip" onclick="hideUpgradeModal()">Maybe later</button>
   </div>

@@ -269,11 +269,11 @@ function setBusy(on) {
 }
 
 /* ══════════════════════════════════════════
-   RAZORPAY SECURE PAYMENT
+   100% FREE PAYMENT & UPI SYSTEM
 ══════════════════════════════════════════ */
 const PLANS = {
-  pro:      { amount: 49900,  name:'PostCraft Pro',      desc:'Unlimited posts · Fast AI · History' },
-  lifetime: { amount: 299900, name:'PostCraft Lifetime', desc:'Pay once · All features · Forever' },
+  pro:      { amount: 499,  name:'PostCraft Pro',      desc:'Unlimited posts · Fast AI · History' },
+  lifetime: { amount: 2999, name:'PostCraft Lifetime', desc:'Pay once · All features · Forever' },
 };
 
 function showUpgradeModal(preset) {
@@ -290,6 +290,46 @@ function pickPlan(p) {
   S.selPlan = p;
   document.getElementById('mplanPro')?.classList.toggle('mplan--on', p==='pro');
   document.getElementById('mplanLifetime')?.classList.toggle('mplan--on', p==='lifetime');
+  updateQrCode();
+}
+
+function switchPayTab(tab) {
+  const isUpi = tab === 'upi';
+  document.getElementById('tabUpi')?.classList.toggle('pay-tab--active', isUpi);
+  document.getElementById('tabGateway')?.classList.toggle('pay-tab--active', !isUpi);
+  document.getElementById('panelUpi').style.display = isUpi ? 'block' : 'none';
+  document.getElementById('panelGateway').style.display = isUpi ? 'none' : 'block';
+}
+
+function updateQrCode() {
+  const plan = PLANS[S.selPlan] || PLANS.pro;
+  const upiId = '7880907106@ybl'; // Your UPI ID
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=${upiId}%26pn=PostCraft%26am=${plan.amount}%26cu=INR`;
+  const img = document.getElementById('upiQrImg');
+  if (img) img.src = qrUrl;
+}
+
+function copyUpiId() {
+  const text = document.getElementById('upiIdText')?.textContent || '7880907106@ybl';
+  navigator.clipboard.writeText(text);
+  toast('✓ UPI ID Copied!', 'ok');
+}
+
+function verifyUpiPayment() {
+  const utr = document.getElementById('utrInput')?.value?.trim();
+  if (!utr || utr.length < 10) {
+    toast('⚠️ Please enter valid 12-digit UTR/Ref No.', 'err');
+    document.getElementById('utrInput')?.focus();
+    return;
+  }
+
+  S.plan = S.selPlan;
+  S.credits = 9999;
+  localStorage.setItem('pc_plan', S.selPlan);
+  localStorage.setItem('pc_utr', utr);
+  updateCreditsUI();
+  hideUpgradeModal();
+  toast(`🎉 Payment Submitted (UTR: ${utr})! Welcome to ${S.selPlan === 'lifetime' ? 'Lifetime' : 'Pro'} Plan!`, 'ok');
 }
 
 function initiateRazorpay() {
@@ -298,7 +338,7 @@ function initiateRazorpay() {
 
   const rzp = new window.Razorpay({
     key:         CONFIG.RZP_KEY,
-    amount:      plan.amount,
+    amount:      plan.amount * 100,
     currency:    'INR',
     name:        'PostCraft AI',
     description: plan.desc,

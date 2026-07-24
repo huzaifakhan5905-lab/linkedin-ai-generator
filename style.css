@@ -498,7 +498,44 @@ body {
 .toast-ok  { border-color: rgba(48,209,88,.3); color: var(--green); }
 .toast-err { border-color: rgba(255,69,58,.3); color: var(--red); }
 
-/* ══ FOOTER ═══════════════════════════════════════ */
+/* ── PAYMENT TABS & UPI STYLING ── */
+.pay-tabs {
+  display: flex; gap: 6px; margin-bottom: 16px; background: var(--s2);
+  padding: 4px; border-radius: var(--r-md); border: 1px solid var(--border2);
+}
+.pay-tab {
+  flex: 1; padding: 8px 10px; border-radius: var(--r-sm); border: none;
+  background: transparent; color: var(--t2); font-size: .78rem; font-weight: 600;
+  cursor: pointer; transition: all .15s var(--ease); font-family: 'DM Sans', sans-serif;
+}
+.pay-tab:hover { color: var(--t1); }
+.pay-tab--active { background: var(--s3); color: #60AAFF; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+
+.upi-box {
+  background: var(--s2); border: 1px solid var(--border2);
+  border-radius: var(--r-lg); padding: 16px; display: flex; flex-direction: column;
+  align-items: center; gap: 12px; margin-bottom: 14px;
+}
+.qr-wrap {
+  background: #fff; padding: 10px; border-radius: var(--r-md);
+  box-shadow: 0 4px 16px rgba(0,0,0,.4); display: flex;
+}
+.qr-wrap img { width: 140px; height: 140px; display: block; }
+.upi-info p { font-size: .78rem; color: var(--t2); text-align: center; margin-bottom: 8px; }
+.upi-id-row {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--s3); padding: 6px 12px; border-radius: var(--r-full);
+  border: 1px solid var(--border2); font-size: .82rem; font-weight: 700; color: var(--t1);
+}
+.btn-copy-upi {
+  background: rgba(10,132,255,.2); color: #60AAFF; border: none;
+  padding: 3px 10px; border-radius: var(--r-full); font-size: .7rem;
+  font-weight: 700; cursor: pointer; transition: background .15s;
+}
+.btn-copy-upi:hover { background: rgba(10,132,255,.35); }
+
+.utr-group { text-align: left; }
+
 .footer { border-top: 1px solid var(--border); padding: 44px 0 28px; }
 .footer__inner { display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center; }
 .footer__logo { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; }
