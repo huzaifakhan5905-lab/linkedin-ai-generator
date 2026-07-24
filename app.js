@@ -343,60 +343,115 @@ function printCarouselPdf() {
   const slides = document.querySelectorAll('#carouselSlidesContainer .carousel-slide');
   if (!slides.length) return;
 
-  // Build structured slide data
-  const slideData = [];
-  slides.forEach((slide, idx) => {
-    const num  = slide.querySelector('.carousel-slide__num')?.textContent || `Slide ${idx + 1}`;
-    const text = slide.querySelector('.carousel-slide__text')?.textContent || '';
-    slideData.push({ num, text, index: idx + 1, total: slides.length });
-  });
-
-  // Remove any stale print area
-  const old = document.getElementById('carouselPrintArea');
-  if (old) old.remove();
-
-  // Create print-only container
-  const printArea = document.createElement('div');
-  printArea.id = 'carouselPrintArea';
-  printArea.style.cssText = 'display:none;';
-
-  const colors = [
-    'linear-gradient(135deg,#0A1628 0%,#0D1533 100%)',
-    'linear-gradient(135deg,#100E2A 0%,#1A1050 100%)',
-    'linear-gradient(135deg,#0A2010 0%,#0F2E18 100%)',
-    'linear-gradient(135deg,#1A0A28 0%,#2A0E40 100%)',
-    'linear-gradient(135deg,#1A1400 0%,#2A2000 100%)',
+  const BG_COLORS = [
+    '#0A1628', '#100E2A', '#0A2010', '#1A0A28', '#1A1400'
   ];
-  const accents = ['#0A84FF','#A78BFA','#30D158','#C084FC','#F5A623'];
+  const ACCENTS = ['#0A84FF', '#A78BFA', '#30D158', '#C084FC', '#F5A623'];
 
-  slideData.forEach((slide, i) => {
-    const bg     = colors[i % colors.length];
-    const accent = accents[i % accents.length];
-
-    const div = document.createElement('div');
-    div.className = 'carousel-print-slide';
-    div.style.cssText = `background:${bg};`;
-    div.innerHTML = `
-      <div class="carousel-print-slide__brand" style="color:${accent}">PostCraft AI</div>
-      <div class="carousel-print-slide__number" style="color:${accent}80">${slide.num}</div>
-      <div class="carousel-print-slide__text">${esc(slide.text)}</div>
-      <div class="carousel-print-slide__footer">
-        <span class="carousel-print-slide__logo">PostCraft AI · Free LinkedIn Generator</span>
-      </div>
-    `;
-    printArea.appendChild(div);
+  // Collect slide data
+  const slideData = [];
+  slides.forEach((slide, i) => {
+    slideData.push({
+      num:    slide.querySelector('.carousel-slide__num')?.textContent  || `Slide ${i+1}`,
+      text:   slide.querySelector('.carousel-slide__text')?.textContent || '',
+      bg:     BG_COLORS[i % BG_COLORS.length],
+      accent: ACCENTS[i % ACCENTS.length],
+    });
   });
 
-  document.body.appendChild(printArea);
+  // Build self-contained print HTML
+  const slidesHtml = slideData.map(s => `
+    <div class="slide" style="background:${s.bg};">
+      <div class="brand" style="color:${s.accent}">PostCraft AI</div>
+      <div class="slide-num" style="color:${s.accent}99">${s.num}</div>
+      <div class="slide-text">${s.text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+      <div class="slide-footer">PostCraft AI &bull; Free LinkedIn Post Generator</div>
+    </div>
+  `).join('');
 
-  // Print then clean up
-  setTimeout(() => {
-    window.print();
-    setTimeout(() => {
-      const area = document.getElementById('carouselPrintArea');
-      if (area) area.remove();
-    }, 1500);
-  }, 80);
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>LinkedIn Carousel — PostCraft AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    @page { size: 600px 600px; margin: 0; }
+    body { background: #000; font-family: 'DM Sans', sans-serif; }
+
+    .slide {
+      width: 600px;
+      height: 600px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 56px 52px;
+      page-break-after: always;
+      break-after: page;
+      position: relative;
+    }
+
+    .brand {
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+    }
+
+    .slide-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .slide-text {
+      color: #ffffff;
+      font-size: 22px;
+      font-weight: 500;
+      line-height: 1.65;
+      max-width: 440px;
+      white-space: pre-wrap;
+    }
+
+    .slide-footer {
+      position: absolute;
+      bottom: 28px;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 10px;
+      color: rgba(255,255,255,0.28);
+      font-weight: 500;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+  ${slidesHtml}
+  <script>
+    window.onload = function() {
+      setTimeout(function() { window.print(); }, 400);
+    };
+  <\/script>
+</body>
+</html>`;
+
+  // Open new window and write content
+  const win = window.open('', '_blank', 'width=640,height=680');
+  if (!win) {
+    toast('⚠️ Popup blocked! Allow popups for this site and try again.', 'err');
+    return;
+  }
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
 }
 
 /* ── SCORES & COPY ───────────────────────────────────── */
