@@ -3,14 +3,89 @@
 //        headline, about, calendar, analyze, hashtags, transform, repurpose, dm
 
 const MODELS = [
-  'meta-llama/llama-3.3-70b-instruct:free',
   'google/gemini-2.0-flash-lite-preview-02-05:free',
+  'meta-llama/llama-3.3-70b-instruct:free',
   'meta-llama/llama-3.1-8b-instruct:free',
   'google/gemini-2.0-flash-exp:free',
-  'qwen/qwen-2.5-coder-32b-instruct:free',
   'mistralai/mistral-7b-instruct:free',
+  'qwen/qwen-2.5-coder-32b-instruct:free',
   'deepseek/deepseek-r1:free',
+  'openchat/openchat-7b:free',
+  'gryphe/mythomax-l2-13b:free'
 ];
+
+/* ══════════════════════════════════════════
+   AI CALL HELPER — WITH MULTI-MODEL AUTO-FAILOVER
+══════════════════════════════════════════ */
+async function callAI(apiKey, prompt, maxTokens = 700) {
+  let lastError = null;
+
+  // 1. Primary Attempt: Pass full MODELS array to OpenRouter for native instant auto-failover
+  try {
+    const headers = new Headers();
+    headers.set('Authorization', `Bearer ${apiKey}`);
+    headers.set('Content-Type', 'application/json');
+    headers.set('HTTP-Referer', 'https://postcraft.ai');
+    headers.set('X-Title', 'PostCraft AI');
+
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        models: MODELS,
+        messages: [
+          { role: 'system', content: 'You are an expert LinkedIn content creator. Authentic, engaging, viral. Never generic.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.85,
+        max_tokens: maxTokens,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const text = data.choices?.[0]?.message?.content?.trim();
+      if (text) return { text, model: data.model || 'openrouter-auto-failover' };
+    }
+  } catch (err) {
+    console.warn('[OpenRouter Auto-Failover] switch needed:', err.message);
+  }
+
+  // 2. Secondary Attempt: Sequential model-by-model fallback loop
+  for (const model of MODELS) {
+    try {
+      const headers = new Headers();
+      headers.set('Authorization', `Bearer ${apiKey}`);
+      headers.set('Content-Type', 'application/json');
+
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: 'You are an expert LinkedIn content creator. Authentic, engaging, viral. Never generic.' },
+            { role: 'user', content: prompt }
+          ],
+          temperature: 0.85,
+          max_tokens: maxTokens,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const text = data.choices?.[0]?.message?.content?.trim();
+        if (text) return { text, model };
+      }
+    } catch (err) {
+      console.warn(`[${model}] failed:`, err.message);
+      lastError = err;
+    }
+  }
+
+  throw lastError || new Error('All AI models failed.');
+}
+
 
 
 const STYLE_PROMPTS = {
@@ -206,43 +281,8 @@ function buildRepurposePrompt({ content, sourceType }) {
   return `Repurpose this ${sourceLabels[sourceType]||'content'} into 4 LinkedIn formats:\n\nSOURCE CONTENT:\n"${content.slice(0,2000)}"\n\nCreate:\n1. LinkedIn Post (150-280 words, viral hook, strong CTA)\n2. Carousel Outline (5-7 slides with slide titles and key points)\n3. LinkedIn Poll (question + 4 options)\n4. Comment Starter (a question to post as a comment to drive engagement)\n\nFormat:\n---POST---\n[linkedin post]\n---CAROUSEL---\nSlide 1: [title]\n[key point]\nSlide 2: [title]\n[key point]\n[continue...]\n---POLL---\nQUESTION: [question]\nA: [option] B: [option] C: [option] D: [option]\n---COMMENT---\n[engagement question]`;
 }
 
-/* ══════════════════════════════════════════
-   AI CALL HELPER
-══════════════════════════════════════════ */
-async function callAI(apiKey, prompt, maxTokens = 700) {
-  let lastError = null;
-  for (const model of MODELS) {
-    try {
-      const headers = new Headers();
-      headers.set('Authorization', `Bearer ${apiKey}`);
-      headers.set('Content-Type', 'application/json');
-      headers.set('HTTP-Referer', 'https://postcraft.ai');
-      headers.set('X-Title', 'PostCraft AI');
-      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST', headers,
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role:'system', content:'You are an expert LinkedIn content creator. Authentic, engaging, viral. Never generic.' },
-            { role:'user', content: prompt }
-          ],
-          temperature: 0.88, max_tokens: maxTokens,
-        }),
-      });
-      if (!response.ok) {
-        const err = await response.json().catch(()=>({}));
-        throw new Error(`${response.status}: ${err.error?.message||response.statusText}`);
-      }
-      const data = await response.json();
-      const text = data.choices?.[0]?.message?.content?.trim();
-      if (text) return { text, model };
-    } catch (err) {
-      console.warn(`[${model}] failed:`, err.message);
-      lastError = err;
-    }
-  }
-  throw lastError || new Error('All AI models failed.');
-}
+
+
 
 /* ══════════════════════════════════════════
    INTELLIGENT FALLBACK GENERATOR (0% FAILURE RATE)
