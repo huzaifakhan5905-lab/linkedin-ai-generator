@@ -1110,26 +1110,31 @@ function renderResult(post) {
 }
 
 /* ── SMART LINKEDIN SHARE (MOBILE + DESKTOP) ── */
-async function shareOnLinkedIn() {
+function shareOnLinkedIn() {
   if (!S.post) {
     toast('⚠️ No post generated to share','err');
     return;
   }
 
-  // 1. Always copy text to clipboard first
+  // 1. Copy text to clipboard synchronously
   try {
-    await navigator.clipboard.writeText(S.post);
-    toast('📋 Post copied! Opening LinkedIn (long-press & paste)','ok');
-  } catch(e) {
-    console.warn('Clipboard write failed:', e);
-  }
+    navigator.clipboard.writeText(S.post);
+  } catch(e) {}
 
-  // 2. Open LinkedIn share endpoint
-  setTimeout(() => {
-    const url = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(S.post)}`;
-    window.open(url, '_blank');
-  }, 450);
+  const text = encodeURIComponent(S.post);
+  const shareUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${text}`;
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  toast('🚀 Opening LinkedIn...','ok');
+
+  // 2. Open LinkedIn share endpoint synchronously without setTimeout so mobile gesture is preserved
+  if (isMobile) {
+    window.location.href = shareUrl;
+  } else {
+    window.open(shareUrl, '_blank', 'noopener,noreferrer');
+  }
 }
+
 
 
 function updateCharCount(len) {
