@@ -980,8 +980,113 @@ function importHistory() {
   inp.click();
 }
 
+/* ══ CAROUSEL 5 COLOR THEMES ══ */
+let currentCarouselTheme = 'dark';
+
+const CAROUSEL_THEMES = {
+  dark:      { bg: ['#0A1628','#100E2A','#0A2010','#1A0A28','#1A1400'], accent: ['#0A84FF','#A78BFA','#30D158','#C084FC','#F5A623'], text: '#FFFFFF' },
+  light:     { bg: ['#F8FAFC','#F1F5F9','#E2E8F0','#EDF2F7','#FEF3C7'], accent: ['#2563EB','#7C3AED','#059669','#D97706','#DC2626'], text: '#0F172A' },
+  neon:      { bg: ['#100E2A','#1D0033','#001F2D','#2D001E','#0D0D0D'], accent: ['#A78BFA','#F472B6','#38BDF8','#FACC15','#4ADE80'], text: '#FFFFFF' },
+  corporate: { bg: ['#0F172A','#1E293B','#0F2942','#132043','#001C30'], accent: ['#38BDF8','#60A5FA','#818CF8','#2DD4BF','#F43F5E'], text: '#FFFFFF' },
+  sunset:    { bg: ['#1C0A28','#2A0826','#2B1009','#1F0322','#150529'], accent: ['#F5A623','#FF6B35','#F43F5E','#E879F9','#FACC15'], text: '#FFFFFF' }
+};
+
+function selectCarouselTheme(theme) {
+  currentCarouselTheme = theme;
+  document.querySelectorAll('.ctheme-btn').forEach(b => b.classList.toggle('ctheme-btn--active', b.dataset.theme === theme));
+  
+  const slides = document.querySelectorAll('#carouselSlidesContainer .carousel-slide');
+  const t = CAROUSEL_THEMES[theme] || CAROUSEL_THEMES.dark;
+  slides.forEach((slide, i) => {
+    slide.style.background = t.bg[i % t.bg.length];
+    slide.style.color = t.text;
+    const num = slide.querySelector('.carousel-slide__num');
+    if (num) { num.style.color = t.accent[i % t.accent.length]; }
+  });
+  toast(`🎨 Theme updated: ${theme}`, 'ok');
+}
+
+/* ══ CSV EXPORT FOR HISTORY ══ */
+function exportHistoryCSV() {
+  const h = getHistory();
+  if (!h.length) { toast('⚠️ No history to export', 'err'); return; }
+  
+  let csv = 'ID,Date,Style,Post Content\n';
+  h.forEach(row => {
+    const cleanPost = `"${(row.post||'').replace(/"/g, '""')}"`;
+    csv += `"${row.id}","${row.date}","${row.style}",${cleanPost}\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'postcraft-history.csv';
+  a.click();
+  toast('✓ Exported CSV for Excel/Google Sheets!', 'ok');
+}
+
+/* ══ LINKEDIN POST TITLE CARD / BANNER IMAGE GENERATOR ══ */
+function downloadPostImage() {
+  if (!S.post) { toast('⚠️ No post to generate image for', 'err'); return; }
+
+  const lines = S.post.split('\n').filter(l => l.trim() !== '');
+  const title = lines[0] || 'LinkedIn Growth Insight';
+  const subtitle = lines[1] || lines[2] || 'PostCraft AI • Viral Content Suite';
+
+  const W = 1200, H = 630;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Background Gradient
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, '#0A1628');
+  grad.addColorStop(0.5, '#100E2A');
+  grad.addColorStop(1, '#080A14');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Decorative Accent Blobs
+  ctx.fillStyle = 'rgba(10, 132, 255, 0.12)';
+  ctx.beginPath(); ctx.arc(150, 100, 220, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = 'rgba(94, 92, 230, 0.12)';
+  ctx.beginPath(); ctx.arc(W - 120, H - 80, 260, 0, Math.PI * 2); ctx.fill();
+
+  // Border Frame
+  ctx.strokeStyle = 'rgba(10, 132, 255, 0.4)';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(30, 30, W - 60, H - 60);
+
+  // Brand Header
+  ctx.fillStyle = '#0A84FF';
+  ctx.font = 'bold 22px sans-serif';
+  ctx.fillText('POSTCRAFT AI  ✦  LINKEDIN CREATOR TOOL', 70, 90);
+
+  // Main Title Text
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = 'bold 36px sans-serif';
+  wrapCanvasText(ctx, title, 70, 200, W - 140, 50);
+
+  // Subtitle / Body Snippet
+  ctx.fillStyle = '#A0AEC0';
+  ctx.font = '22px sans-serif';
+  wrapCanvasText(ctx, subtitle, 70, 400, W - 140, 36);
+
+  // Footer Tagline
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+  ctx.font = '18px sans-serif';
+  ctx.fillText('generator-seven.vercel.app  •  100% Free Forever', 70, H - 65);
+
+  // Trigger Download
+  const a = document.createElement('a');
+  a.download = 'linkedin-post-title-card.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+  toast('✓ High-res Post Image PNG downloaded!', 'ok');
+}
+
 /* ══════════════════════════════════════════
-   GAP #6: CAROUSEL — Canvas PNG Download
+   CAROUSEL — PDF & PNG GENERATORS
 ══════════════════════════════════════════ */
 function openCarouselModal() {
   if (!S.post) return;
@@ -997,9 +1102,12 @@ function openCarouselModal() {
     if (chunk.length>120||idx===body.length-1) { slideContents.push({ title:`KEY POINT ${slideContents.length}`, text:chunk }); chunk=''; }
   });
   slideContents.push({ title:'ACTION', text:cta });
+  
+  const t = CAROUSEL_THEMES[currentCarouselTheme] || CAROUSEL_THEMES.dark;
+
   container.innerHTML = slideContents.map((s,i) => `
-    <div class="carousel-slide" data-idx="${i}">
-      <div class="carousel-slide__num">Slide ${i+1} / ${slideContents.length}</div>
+    <div class="carousel-slide" data-idx="${i}" style="background:${t.bg[i%t.bg.length]};color:${t.text}">
+      <div class="carousel-slide__num" style="color:${t.accent[i%t.accent.length]}">Slide ${i+1} / ${slideContents.length}</div>
       <div class="carousel-slide__text">${esc(s.text)}</div>
       <div class="carousel-slide__foot"><span>PostCraft AI</span><span>Swipe ➔</span></div>
     </div>`).join('');
@@ -1012,12 +1120,11 @@ function closeCarouselModal() { document.getElementById('carouselOverlay').style
 function printCarouselPdf() {
   const slides = document.querySelectorAll('#carouselSlidesContainer .carousel-slide');
   if (!slides.length) return;
-  const BG = ['#0A1628','#100E2A','#0A2010','#1A0A28','#1A1400'];
-  const AC = ['#0A84FF','#A78BFA','#30D158','#C084FC','#F5A623'];
+  const t = CAROUSEL_THEMES[currentCarouselTheme] || CAROUSEL_THEMES.dark;
   const slideData = [...slides].map((s,i) => ({
     num: s.querySelector('.carousel-slide__num')?.textContent||'',
     text: s.querySelector('.carousel-slide__text')?.textContent||'',
-    bg: BG[i%BG.length], accent: AC[i%AC.length]
+    bg: t.bg[i%t.bg.length], accent: t.accent[i%t.accent.length]
   }));
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>LinkedIn Carousel</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
@@ -1039,12 +1146,10 @@ function printCarouselPdf() {
   win.document.open(); win.document.write(html); win.document.close();
 }
 
-// Gap #6: Canvas PNG download for mobile
 function downloadCarouselPng() {
   const slides = document.querySelectorAll('#carouselSlidesContainer .carousel-slide');
   if (!slides.length) { toast('⚠️ No slides to download','err'); return; }
-  const BG = ['#0A1628','#100E2A','#0A2010','#1A0A28','#1A1400'];
-  const AC = ['#0A84FF','#A78BFA','#30D158','#C084FC','#F5A623'];
+  const t = CAROUSEL_THEMES[currentCarouselTheme] || CAROUSEL_THEMES.dark;
   const W = 400, H = 400;
   const canvas = document.createElement('canvas');
   canvas.width = W; canvas.height = H * slides.length;
@@ -1052,10 +1157,10 @@ function downloadCarouselPng() {
 
   [...slides].forEach((slide,i) => {
     const y = i*H;
-    ctx.fillStyle = BG[i%BG.length]; ctx.fillRect(0,y,W,H);
-    ctx.fillStyle = AC[i%AC.length]; ctx.font = 'bold 10px sans-serif'; ctx.textAlign='center';
+    ctx.fillStyle = t.bg[i%t.bg.length]; ctx.fillRect(0,y,W,H);
+    ctx.fillStyle = t.accent[i%t.accent.length]; ctx.font = 'bold 10px sans-serif'; ctx.textAlign='center';
     ctx.fillText('PostCraft AI', W/2, y+32);
-    ctx.fillStyle = '#ffffff'; ctx.font = '15px sans-serif';
+    ctx.fillStyle = t.text; ctx.font = '15px sans-serif';
     const text = slide.querySelector('.carousel-slide__text')?.textContent||'';
     wrapCanvasText(ctx, text, W/2, y+H/2-30, W-60, 22);
     ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.font='9px sans-serif';
@@ -1063,7 +1168,7 @@ function downloadCarouselPng() {
   });
 
   const a = document.createElement('a');
-  a.download = 'linkedin-carousel-postcraft.png';
+  a.download = `linkedin-carousel-${currentCarouselTheme}.png`;
   a.href = canvas.toDataURL('image/png'); a.click();
   toast('✓ PNG downloaded!','ok');
 }
@@ -1080,6 +1185,7 @@ function wrapCanvasText(ctx, text, x, y, maxW, lineH) {
   });
   if (line.trim()) ctx.fillText(line.trim(), x, cy);
 }
+
 
 /* ══════════════════════════════════════════
    RENDER RESULT (Gap #1: Inline Editing)

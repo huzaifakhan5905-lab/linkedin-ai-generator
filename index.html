@@ -717,14 +717,24 @@
   </div>
 </div>
 
-<!-- CAROUSEL OVERLAY (GAP #6: PDF + PNG Buttons) -->
+<!-- CAROUSEL OVERLAY (GAP #6: PDF + PNG Buttons + 5 Color Themes) -->
 <div id="carouselOverlay" class="overlay" style="display:none;">
   <div class="modal modal--lg">
     <div class="modal__head">
       <div class="modal__h3">🎨 LinkedIn Carousel Preview</div>
       <button class="modal__close" onclick="closeCarouselModal()">&times;</button>
     </div>
-    <p class="modal__p" style="margin-bottom:14px">Your post auto-converted into a multi-slide carousel!</p>
+    
+    <!-- 5 Carousel Themes Selector -->
+    <div class="carousel-theme-bar">
+      <span class="lbl" style="margin:0;align-self:center">Color Theme:</span>
+      <button class="ctheme-btn ctheme-btn--active" data-theme="dark" onclick="selectCarouselTheme('dark')">🌌 Midnight</button>
+      <button class="ctheme-btn" data-theme="light" onclick="selectCarouselTheme('light')">⚪ Minimal Light</button>
+      <button class="ctheme-btn" data-theme="neon" onclick="selectCarouselTheme('neon')">🟣 Neon</button>
+      <button class="ctheme-btn" data-theme="corporate" onclick="selectCarouselTheme('corporate')">🟦 Corporate</button>
+      <button class="ctheme-btn" data-theme="sunset" onclick="selectCarouselTheme('sunset')">🌅 Sunset</button>
+    </div>
+
     <div class="carousel-preview-container" id="carouselSlidesContainer"></div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
       <button class="btn btn--primary" onclick="printCarouselPdf()">🖨️ Download PDF Carousel</button>
@@ -766,15 +776,26 @@
     </div>
     <div id="historyList" class="history-list"></div>
     <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
-      <button class="btn btn--ghost btn--sm" onclick="exportHistory()">💾 Export Backup</button>
-      <button class="btn btn--ghost btn--sm" onclick="importHistory()">📥 Import Backup</button>
+      <button class="btn btn--ghost btn--sm" onclick="exportHistory()">💾 JSON</button>
+      <button class="btn btn--ghost btn--sm" onclick="exportHistoryCSV()">📊 CSV (Excel)</button>
+      <button class="btn btn--ghost btn--sm" onclick="importHistory()">📥 Import</button>
       <button class="btn btn--outline btn--sm" onclick="clearHistory()" style="margin-left:auto;color:var(--red)">🗑️ Clear</button>
     </div>
   </div>
 </div>
 
+<!-- MOBILE STICKY BAR FOR 1-TAP COPY & LAUNCH -->
+<div id="mobileStickyBar" class="mobile-sticky-bar" style="display:none;">
+  <span id="mobileBarStatus">✓ Post Ready</span>
+  <div style="display:flex;gap:6px">
+    <button class="btn btn--primary btn--sm" onclick="copyPost()">📋 Copy</button>
+    <button class="btn btn--li btn--sm" onclick="shareOnLinkedIn()">Share ↗</button>
+  </div>
+</div>
+
 <!-- TOAST NOTIFICATION -->
 <div id="toast" class="toast" style="display:none;"></div>
+
 
 <script src="app.js"></script>
 </body>
