@@ -1,5 +1,6 @@
-// api/generate.js — PostCraft AI Secure Vercel Serverless Function
-// Supports: post, variations, comment, connection, poll modes + real URL fetching
+// api/generate.js — PostCraft AI Serverless API v3.0
+// Modes: post, variations, comment, connection, poll,
+//        headline, about, calendar, analyze, hashtags, transform, repurpose, dm
 
 const MODELS = [
   'google/gemini-2.0-flash-exp:free',
@@ -7,8 +8,6 @@ const MODELS = [
   'inclusionai/ling-3.0-flash:free',
   'deepseek/deepseek-r1:free',
   'qwen/qwen-2.5-coder-32b-instruct:free',
-  'poolside/laguna-s-2.1:free',
-  'poolside/laguna-xs-2.1:free',
 ];
 
 const STYLE_PROMPTS = {
@@ -19,13 +18,13 @@ const STYLE_PROMPTS = {
   motivational: 'Uplifting and real. NOT cliché. Make readers feel seen and motivated.',
   casestudy:    'Situation → Approach → Result (with specifics) → Key takeaway.',
   justin_welsh: "Write in Justin Welsh's style: ultra-concise, line-by-line formatting, actionable 1-person business systems, zero fluff.",
-  sahil_bloom:  "Write in Sahil Bloom's style: visual mental models, breakdown of key principles, high leverage storytelling with 5 bullet takeaways.",
+  sahil_bloom:  "Write in Sahil Bloom's style: visual mental models, breakdown of key principles, 5 bullet takeaways.",
   paul_graham:  "Write in Paul Graham's style: thoughtful essayist tone, deep startup wisdom, clear contrarian perspective.",
-  ruben_hassid: "Write in Ruben Hassid's style: punchy 1-line scroll-stopping hook, double line breaks, bold subheaders, viral LinkedIn formatting."
+  ruben_hassid: "Write in Ruben Hassid's style: punchy 1-line scroll-stopping hook, double line breaks, viral LinkedIn formatting."
 };
 
 const TONE_PROMPTS = {
-  casual:        'Tone: conversational, real, like talking to a smart friend. No corporate speak.',
+  casual:        'Tone: conversational, real, like talking to a smart friend.',
   professional:  'Tone: polished, authoritative, clear. No fluff.',
   bold:          'Tone: confident, provocative, direct. Do not hedge.',
   empathetic:    'Tone: warm, human, emotionally connecting.',
@@ -33,7 +32,9 @@ const TONE_PROMPTS = {
   humorous:      'Tone: genuinely witty and clever. Not forced.',
 };
 
-/* ── YouTube Video ID Extractor ── */
+/* ══════════════════════════════════════════
+   URL FETCHING
+══════════════════════════════════════════ */
 function extractYouTubeId(url) {
   const patterns = [
     /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
@@ -46,230 +47,133 @@ function extractYouTubeId(url) {
   return null;
 }
 
-/* ── YouTube: Use oEmbed API (free, no API key needed) ── */
 async function fetchYouTubeContent(videoId) {
   try {
-    const oembedUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`;
-    const controller = new AbortController();
-    setTimeout(() => controller.abort(), 6000);
-    const res = await fetch(oembedUrl, { signal: controller.signal });
+    const ctrl = new AbortController();
+    setTimeout(() => ctrl.abort(), 6000);
+    const res = await fetch(
+      `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`,
+      { signal: ctrl.signal }
+    );
     if (!res.ok) return null;
-    const data = await res.json();
-    return {
-      type: 'youtube',
-      title: data.title || '',
-      channel: data.author_name || '',
-    };
-  } catch (e) {
-    console.warn('YouTube oEmbed failed:', e.message);
-    return null;
-  }
+    const d = await res.json();
+    return { type: 'youtube', title: d.title || '', channel: d.author_name || '' };
+  } catch { return null; }
 }
 
-/* ── Web Article: Extract meta tags + clean body text ── */
 async function fetchWebContent(url) {
   try {
-    const controller = new AbortController();
-    setTimeout(() => controller.abort(), 8000);
+    const ctrl = new AbortController();
+    setTimeout(() => ctrl.abort(), 8000);
     const res = await fetch(url, {
-      signal: controller.signal,
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; PostCraftBot/1.0; +https://postcraft.ai)' }
+      signal: ctrl.signal,
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; PostCraftBot/1.0)' }
     });
     if (!res.ok) return null;
-
     const html = await res.text();
-
-    // Extract meta data first — most reliable
-    const ogTitle   = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i)?.[1]
-                   || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:title["']/i)?.[1];
-    const ogDesc    = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i)?.[1]
-                   || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:description["']/i)?.[1];
-    const metaDesc  = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i)?.[1];
-    const titleTag  = html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim();
-
-    // Extract clean article body — remove all junk
-    const cleanBody = html
-      .replace(/<script[\s\S]*?<\/script>/gi, '')
-      .replace(/<style[\s\S]*?<\/style>/gi, '')
-      .replace(/<nav[\s\S]*?<\/nav>/gi, '')
-      .replace(/<footer[\s\S]*?<\/footer>/gi, '')
-      .replace(/<header[\s\S]*?<\/header>/gi, '')
-      .replace(/<aside[\s\S]*?<\/aside>/gi, '')
-      .replace(/<form[\s\S]*?<\/form>/gi, '')
-      .replace(/<!--[\s\S]*?-->/g, '')
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-      .replace(/\s{2,}/g, ' ')
-      .trim();
-
-    // Build context: meta tags first (most accurate), then body
-    const title   = ogTitle || titleTag || '';
+    const ogTitle  = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i)?.[1];
+    const ogDesc   = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i)?.[1];
+    const metaDesc = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i)?.[1];
+    const titleTag = html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim();
+    const body = html
+      .replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<style[\s\S]*?<\/style>/gi,'')
+      .replace(/<nav[\s\S]*?<\/nav>/gi,'').replace(/<footer[\s\S]*?<\/footer>/gi,'')
+      .replace(/<header[\s\S]*?<\/header>/gi,'').replace(/<aside[\s\S]*?<\/aside>/gi,'')
+      .replace(/<[^>]+>/g,' ').replace(/\s{2,}/g,' ').trim().slice(0,1800);
+    const title = ogTitle || titleTag || '';
     const snippet = ogDesc || metaDesc || '';
-    const body    = cleanBody.slice(0, 1800);
-
-    const combined = [
-      title && `TITLE: ${title}`,
-      snippet && `SUMMARY: ${snippet}`,
-      body && `CONTENT: ${body}`,
-    ].filter(Boolean).join('\n\n');
-
-    return combined.length > 80
-      ? { type: 'article', title, text: combined }
-      : null;
-  } catch (e) {
-    console.warn('Web fetch failed:', e.message);
-    return null;
-  }
+    const combined = [title&&`TITLE: ${title}`, snippet&&`SUMMARY: ${snippet}`, body&&`CONTENT: ${body}`].filter(Boolean).join('\n\n');
+    return combined.length > 80 ? { type:'article', title, text: combined } : null;
+  } catch { return null; }
 }
 
-/* ── Smart URL Content Fetcher (Router) ── */
 async function fetchUrlContent(url) {
   const ytId = extractYouTubeId(url);
   if (ytId) return fetchYouTubeContent(ytId);
   return fetchWebContent(url);
 }
 
-
-
-/* ── Prompt Builders ── */
+/* ══════════════════════════════════════════
+   PROMPT BUILDERS
+══════════════════════════════════════════ */
 function buildPostPrompt({ content, urlType, urlMeta, style, tone, useEmoji, useHashtag, useHook }) {
-  const styleInstruction = STYLE_PROMPTS[style] || STYLE_PROMPTS.storytelling;
-  const toneInstruction = TONE_PROMPTS[tone] || TONE_PROMPTS.casual;
-
-  let sourceBlock;
+  const sty = STYLE_PROMPTS[style] || STYLE_PROMPTS.storytelling;
+  const ton = TONE_PROMPTS[tone] || TONE_PROMPTS.casual;
+  let src;
   if (urlType === 'youtube') {
-    sourceBlock = `YOUTUBE VIDEO: "${urlMeta.title}" by ${urlMeta.channel}\nINSTRUCTION: Write a viral LinkedIn post sharing the key insights, lessons, or ideas from this YouTube video. Imagine you just watched it and want to share the best takeaways with your network.`;
+    src = `YOUTUBE VIDEO: "${urlMeta.title}" by ${urlMeta.channel}\nINSTRUCTION: Write a viral LinkedIn post sharing key insights from this video. Imagine you just watched it.`;
   } else if (urlType === 'article') {
-    sourceBlock = `WEB ARTICLE CONTENT:\n${content}\nINSTRUCTION: Extract the most valuable insights from this article and write a viral LinkedIn post that shares the key lessons with your professional network.`;
+    src = `WEB ARTICLE:\n${content}\nINSTRUCTION: Extract the most valuable insights and write a viral LinkedIn post.`;
   } else {
-    sourceBlock = `TOPIC: "${content}"`;
+    src = `TOPIC: "${content}"`;
   }
-
-  return `You are an elite LinkedIn content strategist. Write a high-performing LinkedIn post.
-
-${sourceBlock}
-
-STYLE: ${styleInstruction}
-${toneInstruction}
-${useHook ? 'HOOK: First line MUST stop the scroll — specific, surprising, or emotionally charged. Never start with "I".' : ''}
-${useEmoji ? 'Use 2-4 relevant emojis naturally.' : 'NO emojis.'}
-${useHashtag ? 'End with 3-5 relevant hashtags on a new line.' : 'NO hashtags.'}
-
-RULES:
-- Short paragraphs (max 2-3 sentences)
-- 150-280 words total
-- NEVER use "In today\'s world", "I\'m excited to share", "game-changer"
-- Be specific and personal
-- End with a question or call to action
-
-Output ONLY the post. No labels, no extra text.`;
+  return `You are an elite LinkedIn content strategist.\n\n${src}\n\nSTYLE: ${sty}\n${ton}\n${useHook?'HOOK: First line MUST stop the scroll. Never start with "I".':''}\n${useEmoji?'Use 2-4 emojis naturally.':'NO emojis.'}\n${useHashtag?'End with 3-5 hashtags.':'NO hashtags.'}\n\nRULES: Short paragraphs (2-3 sentences max). 150-280 words. NEVER use "In today\'s world", "excited to share", "game-changer". End with question or CTA.\n\nOutput ONLY the post.`;
 }
 
 function buildVariationsPrompt({ content, isUrl, tone, useEmoji, useHashtag }) {
-  return `You are an elite LinkedIn content strategist. Generate 3 DIFFERENT high-performing LinkedIn post variations for the same topic.
-
-${isUrl ? `SOURCE CONTENT: "${content}"` : `TOPIC: "${content}"`}
-
-Each variation must use a DIFFERENT style:
-- Variation 1: Personal Story / Narrative style
-- Variation 2: Bold Hot Take / Insight style
-- Variation 3: Numbered List / Tactical style
-
-${TONE_PROMPTS[tone] || TONE_PROMPTS.casual}
-${useEmoji ? 'Use 2-3 relevant emojis per post naturally.' : 'NO emojis.'}
-${useHashtag ? 'End each with 3-5 hashtags.' : 'NO hashtags.'}
-
-RULES per variation:
-- 150-280 words
-- Strong scroll-stopping hook (never start with "I")
-- End with question or CTA
-- NEVER use "In today's world", "I'm excited to share", "game-changer"
-
-Output format (use exactly these separators, nothing else):
----VARIATION 1---
-[post text]
----VARIATION 2---
-[post text]
----VARIATION 3---
-[post text]`;
+  return `Generate 3 DIFFERENT LinkedIn post variations for: ${isUrl?`SOURCE: "${content}"`:`TOPIC: "${content}"`}\n\nVariation 1: Personal Story style\nVariation 2: Bold Hot Take style\nVariation 3: Numbered List style\n\n${TONE_PROMPTS[tone]||TONE_PROMPTS.casual}\n${useEmoji?'2-3 emojis per post.':'NO emojis.'}\n${useHashtag?'3-5 hashtags each.':'NO hashtags.'}\n150-280 words each. Strong hook. End with CTA.\n\n---VARIATION 1---\n[post]\n---VARIATION 2---\n[post]\n---VARIATION 3---\n[post]`;
 }
 
 function buildCommentPrompt({ postContent }) {
-  return `You are an expert LinkedIn engagement strategist. Write 3 thoughtful, high-value comments for the following LinkedIn post.
-
-POST TO COMMENT ON:
-"${postContent}"
-
-Each comment should:
-- Add genuine value, insight, or a personal angle
-- Be 1-3 sentences (50-100 words max)
-- Feel authentic, not generic ("Great post!" is NOT acceptable)
-- End with a relevant question OR a brief personal experience that resonates
-
-Output format (use exactly these separators):
----COMMENT 1---
-[comment text]
----COMMENT 2---
-[comment text]
----COMMENT 3---
-[comment text]`;
+  return `Write 3 thoughtful LinkedIn comments for this post:\n\n"${postContent}"\n\nEach: 50-100 words, adds genuine value, ends with a question. NOT generic.\n\n---COMMENT 1---\n[text]\n---COMMENT 2---\n[text]\n---COMMENT 3---\n[text]`;
 }
 
 function buildConnectionPrompt({ name, role, reason }) {
-  return `You are a LinkedIn networking expert. Write 3 personalized LinkedIn connection request messages.
+  return `Write 3 LinkedIn connection request messages.\nName: ${name||'the person'}\nRole: ${role||'professional'}\nReason: ${reason||'mutual professional interest'}\n\nEach: under 300 chars, specific, warm, not salesy. No "add you to my network".\n\n---MESSAGE 1---\n[text]\n---MESSAGE 2---\n[text]\n---MESSAGE 3---\n[text]`;
+}
 
-Person's Name: ${name || 'the person'}
-Their Role/Industry: ${role || 'professional'}
-Why connecting: ${reason || 'mutual professional interest'}
-
-Each message must:
-- Be under 300 characters (LinkedIn's limit)
-- Mention something specific about their work or role
-- State clearly why you want to connect
-- Sound human, warm, not salesy
-- NO generic phrases like "I'd like to add you to my network"
-
-Output format (use exactly these separators):
----MESSAGE 1---
-[message text]
----MESSAGE 2---
-[message text]
----MESSAGE 3---
-[message text]`;
+function buildDMPrompt({ name, company, purpose, context }) {
+  const purposes = {
+    job:      'asking about job opportunities or referrals',
+    sales:    'a warm sales outreach (NOT cold, value-first approach)',
+    collab:   'proposing a collaboration or partnership',
+    podcast:  'inviting them to be a podcast guest',
+    mentor:   'asking for mentorship or advice',
+    followup: 'following up after meeting at an event or online',
+  };
+  return `Write 3 personalized LinkedIn DM/InMail messages.\nRecipient: ${name||'the person'}\nCompany: ${company||'their company'}\nPurpose: ${purposes[purpose]||'professional networking'}\nContext: ${context||'general professional connection'}\n\nEach message:\n- Under 300 characters for DM (or 300 words for InMail)\n- Personalized, not templated\n- Value-first approach\n- Clear ask at the end\n- Warm but professional\n\n---DM 1---\n[message]\n---DM 2---\n[message]\n---DM 3---\n[message]`;
 }
 
 function buildPollPrompt({ topic }) {
-  return `You are a LinkedIn viral content strategist. Create 3 high-engagement LinkedIn poll ideas for the topic below.
-
-TOPIC: "${topic}"
-
-Each poll must have:
-- 1 engaging, opinionated question (that makes people WANT to vote)
-- Exactly 4 answer options (LinkedIn max)
-- Options should represent real diverse views, not obvious yes/no
-
-Format (use exactly these separators):
----POLL 1---
-QUESTION: [question]
-A: [option]
-B: [option]
-C: [option]
-D: [option]
----POLL 2---
-QUESTION: [question]
-A: [option]
-B: [option]
-C: [option]
-D: [option]
----POLL 3---
-QUESTION: [question]
-A: [option]
-B: [option]
-C: [option]
-D: [option]`;
+  return `Create 3 viral LinkedIn poll ideas for: "${topic}"\n\nEach poll: 1 opinionated question + 4 answer options.\n\n---POLL 1---\nQUESTION: [question]\nA: [option]\nB: [option]\nC: [option]\nD: [option]\n---POLL 2---\nQUESTION: [question]\nA: [option]\nB: [option]\nC: [option]\nD: [option]\n---POLL 3---\nQUESTION: [question]\nA: [option]\nB: [option]\nC: [option]\nD: [option]`;
 }
 
-/* ── Call AI Helper ── */
+function buildHeadlinePrompt({ name, currentRole, targetRole, skills, superpower }) {
+  return `You are a LinkedIn profile expert. Generate 5 powerful LinkedIn profile headlines.\n\nPerson: ${name||'Professional'}\nCurrent Role: ${currentRole}\nTarget Role/Industry: ${targetRole||currentRole}\nTop Skills: ${skills}\nUnique Value/Superpower: ${superpower||'expertise in their field'}\n\nEach headline must:\n- Be under 220 characters (LinkedIn limit)\n- Include keywords for searchability\n- Show value, not just job title\n- Be specific and compelling\n- Mix: role + value + differentiator\n\nHeadline styles to cover:\n1. Role + Result + Differentiator\n2. Who I Help + How + Outcome\n3. Skills-based + Credibility\n4. Bold personal brand statement\n5. Achievement + Role hybrid\n\nOutput format:\n---HEADLINE 1---\n[headline]\n---HEADLINE 2---\n[headline]\n---HEADLINE 3---\n[headline]\n---HEADLINE 4---\n[headline]\n---HEADLINE 5---\n[headline]`;
+}
+
+function buildAboutPrompt({ currentRole, experience, skills, achievements, targetAudience, goal, tone }) {
+  return `You are a LinkedIn profile expert. Write a powerful LinkedIn About/Summary section.\n\nRole: ${currentRole}\nYears of Experience: ${experience||'several years'}\nKey Skills: ${skills}\nKey Achievements: ${achievements||'significant results in their field'}\nTarget Audience: ${targetAudience||'potential employers, clients, collaborators'}\nGoal: ${goal||'grow professionally and build meaningful connections'}\nTone: ${tone||'professional yet personal'}\n\nWrite the About section that:\n- Starts with a scroll-stopping hook (NOT "I am a...")\n- Tells a compelling professional story\n- Highlights measurable achievements\n- Shows personality, not just titles\n- Ends with a clear CTA\n- Is under 2600 characters\n- Uses short paragraphs and white space\n\nOutput ONLY the About section text. No labels.`;
+}
+
+function buildCalendarPrompt({ industry, role, goal }) {
+  return `Create a 7-day LinkedIn content calendar for:\nIndustry: ${industry}\nRole: ${role||'professional'}\nGoal: ${goal||'build authority and grow audience'}\n\nDay 1: Personal Story (failure/lesson)\nDay 2: Hot Take / Controversial Opinion\nDay 3: Listicle (5 tips/tools/lessons)\nDay 4: LinkedIn Poll idea\nDay 5: Behind-the-scenes / Day in life\nDay 6: Industry insight / News take\nDay 7: Motivational / Reflection\n\nFor each day provide:\n- Post type\n- Specific topic/angle\n- Viral hook line (first sentence)\n- Key point to make\n\nFormat:\n---DAY 1---\nTYPE: [type]\nTOPIC: [topic]\nHOOK: [hook]\nKEY POINT: [point]\n[repeat for each day]`;
+}
+
+function buildAnalyzePrompt({ post }) {
+  return `You are a LinkedIn viral content expert. Analyze this LinkedIn post and provide detailed feedback + improved version.\n\nPOST TO ANALYZE:\n"${post}"\n\nProvide:\n1. HOOK SCORE (0-100): Rate the opening line's stopping power\n2. HOOK FEEDBACK: Specific feedback on the hook\n3. READABILITY SCORE (0-100): Paragraph length, formatting, flow\n4. READABILITY FEEDBACK: Specific suggestions\n5. ENGAGEMENT SCORE (0-100): CTA, emotion, relatability\n6. ENGAGEMENT FEEDBACK: Specific improvements\n7. TOP 3 ISSUES: The 3 biggest problems\n8. IMPROVED VERSION: Complete rewritten version of the post\n\nFormat exactly:\nHOOK_SCORE: [number]\nHOOK_FEEDBACK: [text]\nREADABILITY_SCORE: [number]\nREADABILITY_FEEDBACK: [text]\nENGAGEMENT_SCORE: [number]\nENGAGEMENT_FEEDBACK: [text]\nISSUES: [issue1] | [issue2] | [issue3]\n---IMPROVED---\n[improved post]`;
+}
+
+function buildHashtagPrompt({ topic }) {
+  return `Generate 20 optimal LinkedIn hashtags for the topic: "${topic}"\n\nProvide hashtags in 3 categories with estimated audience sizes:\n\nCategory 1 - HIGH VOLUME (1M+ followers): 5 hashtags\nCategory 2 - MID VOLUME (100K-1M followers): 8 hashtags\nCategory 3 - NICHE (10K-100K followers): 7 hashtags\n\nFormat:\n---HIGH VOLUME---\n#[hashtag] (~[size]M followers)\n[repeat x5]\n---MID VOLUME---\n#[hashtag] (~[size]K followers)\n[repeat x8]\n---NICHE---\n#[hashtag] (~[size]K followers)\n[repeat x7]\n\nInclude only real, commonly used LinkedIn hashtags. Relevant to topic.`;
+}
+
+function buildTransformPrompt({ post }) {
+  return `You are a LinkedIn viral content expert. Transform this boring/weak LinkedIn post into a viral, high-performing post.\n\nORIGINAL POST:\n"${post}"\n\nTransform by:\n1. Replacing the hook with a scroll-stopping first line\n2. Breaking long paragraphs into punchy 1-2 line chunks\n3. Adding emotional depth or specific detail\n4. Strengthening the CTA or ending\n5. Making it feel more human and less corporate\n\nOutput:\n---ORIGINAL---\n${post}\n---TRANSFORMED---\n[improved post]`;
+}
+
+function buildRepurposePrompt({ content, sourceType }) {
+  const sourceLabels = {
+    twitter: 'Twitter/X thread', blog: 'blog article',
+    newsletter: 'newsletter', youtube: 'YouTube video script',
+    speech: 'presentation/speech'
+  };
+  return `Repurpose this ${sourceLabels[sourceType]||'content'} into 4 LinkedIn formats:\n\nSOURCE CONTENT:\n"${content.slice(0,2000)}"\n\nCreate:\n1. LinkedIn Post (150-280 words, viral hook, strong CTA)\n2. Carousel Outline (5-7 slides with slide titles and key points)\n3. LinkedIn Poll (question + 4 options)\n4. Comment Starter (a question to post as a comment to drive engagement)\n\nFormat:\n---POST---\n[linkedin post]\n---CAROUSEL---\nSlide 1: [title]\n[key point]\nSlide 2: [title]\n[key point]\n[continue...]\n---POLL---\nQUESTION: [question]\nA: [option] B: [option] C: [option] D: [option]\n---COMMENT---\n[engagement question]`;
+}
+
+/* ══════════════════════════════════════════
+   AI CALL HELPER
+══════════════════════════════════════════ */
 async function callAI(apiKey, prompt, maxTokens = 700) {
   let lastError = null;
   for (const model of MODELS) {
@@ -279,26 +183,21 @@ async function callAI(apiKey, prompt, maxTokens = 700) {
       headers.set('Content-Type', 'application/json');
       headers.set('HTTP-Referer', 'https://postcraft.ai');
       headers.set('X-Title', 'PostCraft AI');
-
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers,
+        method: 'POST', headers,
         body: JSON.stringify({
           model,
           messages: [
-            { role: 'system', content: 'You are an expert LinkedIn content creator. Authentic, engaging, viral. Never generic.' },
-            { role: 'user', content: prompt }
+            { role:'system', content:'You are an expert LinkedIn content creator. Authentic, engaging, viral. Never generic.' },
+            { role:'user', content: prompt }
           ],
-          temperature: 0.88,
-          max_tokens: maxTokens,
+          temperature: 0.88, max_tokens: maxTokens,
         }),
       });
-
       if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(`${response.status}: ${err.error?.message || response.statusText}`);
+        const err = await response.json().catch(()=>({}));
+        throw new Error(`${response.status}: ${err.error?.message||response.statusText}`);
       }
-
       const data = await response.json();
       const text = data.choices?.[0]?.message?.content?.trim();
       if (text) return { text, model };
@@ -310,90 +209,132 @@ async function callAI(apiKey, prompt, maxTokens = 700) {
   throw lastError || new Error('All AI models failed.');
 }
 
-/* ── Main Handler ── */
+/* ══════════════════════════════════════════
+   MAIN HANDLER
+══════════════════════════════════════════ */
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
   const apiKey = (process.env.OPENROUTER_API_KEY || '').trim();
-  if (!apiKey) return res.status(500).json({ error: 'OPENROUTER_API_KEY not configured.' });
+  if (!apiKey) return res.status(500).json({ error: 'OPENROUTER_API_KEY not configured on server.' });
 
-  const { mode = 'post', topic, style, tone, useEmoji, useHashtag, useHook, inputMode,
-          postContent, name, role, reason } = req.body || {};
+  const body = req.body || {};
+  const { mode='post', topic, style, tone, useEmoji, useHashtag, useHook, inputMode,
+          postContent, name, role, reason, company, purpose, context,
+          currentRole, experience, skills, achievements, targetAudience, goal, superpower, targetRole,
+          industry, post, sourceType } = body;
 
   try {
-    // ── MODE: Comment Generator
+    // ── COMMENT
     if (mode === 'comment') {
-      if (!postContent || postContent.trim().length < 20) {
-        return res.status(400).json({ error: 'Post content required for comment generation.' });
-      }
-      const prompt = buildCommentPrompt({ postContent: postContent.trim().slice(0, 1000) });
-      const { text } = await callAI(apiKey, prompt, 600);
-      return res.status(200).json({ success: true, result: text });
+      if (!postContent || postContent.trim().length < 20) return res.status(400).json({ error: 'Post content required.' });
+      const { text } = await callAI(apiKey, buildCommentPrompt({ postContent: postContent.trim().slice(0,1000) }), 600);
+      return res.status(200).json({ success:true, result:text });
     }
 
-    // ── MODE: Connection Request Generator
+    // ── CONNECTION REQUEST
     if (mode === 'connection') {
-      const prompt = buildConnectionPrompt({ name, role, reason });
-      const { text } = await callAI(apiKey, prompt, 500);
-      return res.status(200).json({ success: true, result: text });
+      const { text } = await callAI(apiKey, buildConnectionPrompt({ name, role, reason }), 500);
+      return res.status(200).json({ success:true, result:text });
     }
 
-    // ── MODE: Poll Generator
+    // ── DM / INMAIL
+    if (mode === 'dm') {
+      const { text } = await callAI(apiKey, buildDMPrompt({ name, company, purpose, context }), 700);
+      return res.status(200).json({ success:true, result:text });
+    }
+
+    // ── POLL
     if (mode === 'poll') {
-      if (!topic || topic.trim().length < 3) {
-        return res.status(400).json({ error: 'Topic required for poll generation.' });
-      }
-      const prompt = buildPollPrompt({ topic: topic.trim().slice(0, 300) });
-      const { text } = await callAI(apiKey, prompt, 800);
-      return res.status(200).json({ success: true, result: text });
+      if (!topic?.trim() || topic.trim().length < 3) return res.status(400).json({ error: 'Topic required.' });
+      const { text } = await callAI(apiKey, buildPollPrompt({ topic: topic.trim().slice(0,300) }), 800);
+      return res.status(200).json({ success:true, result:text });
     }
 
-    // ── For post/variations modes — need topic
+    // ── HEADLINE GENERATOR
+    if (mode === 'headline') {
+      if (!currentRole) return res.status(400).json({ error: 'Current role required.' });
+      const { text } = await callAI(apiKey, buildHeadlinePrompt({ name, currentRole, targetRole, skills, superpower }), 800);
+      return res.status(200).json({ success:true, result:text });
+    }
+
+    // ── ABOUT / BIO WRITER
+    if (mode === 'about') {
+      if (!currentRole) return res.status(400).json({ error: 'Current role required.' });
+      const { text } = await callAI(apiKey, buildAboutPrompt({ currentRole, experience, skills, achievements, targetAudience, goal, tone }), 1200);
+      return res.status(200).json({ success:true, result:text });
+    }
+
+    // ── CONTENT CALENDAR
+    if (mode === 'calendar') {
+      if (!industry) return res.status(400).json({ error: 'Industry required.' });
+      const { text } = await callAI(apiKey, buildCalendarPrompt({ industry, role, goal }), 1400);
+      return res.status(200).json({ success:true, result:text });
+    }
+
+    // ── POST ANALYZER
+    if (mode === 'analyze') {
+      if (!post || post.trim().length < 30) return res.status(400).json({ error: 'Post content required.' });
+      const { text } = await callAI(apiKey, buildAnalyzePrompt({ post: post.trim() }), 1200);
+      return res.status(200).json({ success:true, result:text });
+    }
+
+    // ── HASHTAG RESEARCH
+    if (mode === 'hashtags') {
+      if (!topic?.trim()) return res.status(400).json({ error: 'Topic required.' });
+      const { text } = await callAI(apiKey, buildHashtagPrompt({ topic: topic.trim() }), 800);
+      return res.status(200).json({ success:true, result:text });
+    }
+
+    // ── BEFORE/AFTER TRANSFORMER
+    if (mode === 'transform') {
+      if (!post || post.trim().length < 20) return res.status(400).json({ error: 'Post content required.' });
+      const { text } = await callAI(apiKey, buildTransformPrompt({ post: post.trim() }), 900);
+      return res.status(200).json({ success:true, result:text });
+    }
+
+    // ── CONTENT REPURPOSER
+    if (mode === 'repurpose') {
+      if (!postContent?.trim()) return res.status(400).json({ error: 'Content required.' });
+      const { text } = await callAI(apiKey, buildRepurposePrompt({ content: postContent, sourceType }), 1600);
+      return res.status(200).json({ success:true, result:text });
+    }
+
+    // ── POST & VARIATIONS — need topic
     if (!topic || typeof topic !== 'string' || topic.trim().length < 3) {
       return res.status(400).json({ error: 'Topic or URL must be provided.' });
     }
 
-    // Real URL Content Fetching with type detection
     const rawInput = topic.trim();
     const isUrl = inputMode === 'url' || /^https?:\/\//i.test(rawInput);
-    let content = rawInput;
-    let urlType = null;
-    let urlMeta = null;
+    let content = rawInput, urlType = null, urlMeta = null, urlFetchFailed = false;
+
     if (isUrl) {
       const fetched = await fetchUrlContent(rawInput);
       if (fetched) {
-        urlType = fetched.type; // 'youtube' | 'article'
-        urlMeta = fetched;     // { title, channel } for youtube; { title, text } for article
-        content = fetched.type === 'youtube'
-          ? `${fetched.title} by ${fetched.channel}` // short summary for variations
-          : (fetched.text || rawInput);
+        urlType = fetched.type;
+        urlMeta = fetched;
+        content = fetched.type === 'youtube' ? `${fetched.title} by ${fetched.channel}` : (fetched.text || rawInput);
+      } else {
+        urlFetchFailed = true; // Gap #3: tell client URL fetch failed
       }
     }
 
-    // ── MODE: 3 Variations
+    // ── VARIATIONS
     if (mode === 'variations') {
-      const ctx = urlType === 'youtube'
-        ? `YouTube Video "${urlMeta.title}" by ${urlMeta.channel}`
-        : content;
-      const prompt = buildVariationsPrompt({ content: ctx.slice(0, 2000), isUrl: !!urlType, tone, useEmoji, useHashtag });
-      const { text } = await callAI(apiKey, prompt, 1400);
-      return res.status(200).json({ success: true, result: text, urlType });
+      const ctx = urlType === 'youtube' ? `YouTube Video "${urlMeta.title}" by ${urlMeta.channel}` : content;
+      const { text } = await callAI(apiKey, buildVariationsPrompt({ content: ctx.slice(0,2000), isUrl:!!urlType, tone, useEmoji, useHashtag }), 1400);
+      return res.status(200).json({ success:true, result:text, urlType, urlFetchFailed });
     }
 
-    // ── MODE: Single Post (default)
-    const prompt = buildPostPrompt({
-      content: content.slice(0, 2000),
-      urlType, urlMeta,
-      style, tone, useEmoji, useHashtag, useHook
-    });
-    const { text, model } = await callAI(apiKey, prompt, 650);
-    return res.status(200).json({ success: true, post: text, modelUsed: model, urlType });
+    // ── SINGLE POST
+    const { text, model } = await callAI(apiKey, buildPostPrompt({ content: content.slice(0,2000), urlType, urlMeta, style, tone, useEmoji, useHashtag, useHook }), 650);
+    return res.status(200).json({ success:true, post:text, modelUsed:model, urlType, urlFetchFailed });
 
   } catch (err) {
     console.error('Handler error:', err.message);

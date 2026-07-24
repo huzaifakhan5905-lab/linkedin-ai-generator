@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PostCraft AI — Free LinkedIn Content &amp; Carousel Generator</title>
-  <meta name="description" content="100% Free AI LinkedIn Post, Carousel, Comment, Poll & Connection Message Generator. Write like top 1% creators." />
-  <meta property="og:title" content="PostCraft AI — Free LinkedIn Post Generator" />
-  <meta property="og:description" content="Create viral LinkedIn posts, carousels, comments & polls in seconds with AI. 100% Free forever." />
+  <title>PostCraft AI — Free LinkedIn Content, Profile & Growth Suite</title>
+  <meta name="description" content="100% Free AI LinkedIn Post Generator, Profile Headline Writer, About Section Creator, Hook Library, DM Templates & Growth Suite. Write like top 1% creators." />
+  <meta property="og:title" content="PostCraft AI — Ultimate Free LinkedIn Growth Suite" />
+  <meta property="og:description" content="Viral posts, profile optimization, hooks, DMs, content calendar & analytics. 100% Free forever." />
   <meta property="og:type" content="website" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -50,208 +50,174 @@
     </nav>
 
     <div class="header__right">
-      <button class="btn btn--ghost btn--sm history-btn" onclick="openHistoryPanel()" id="historyBtn" title="My saved posts">
-        🕐 History
+      <button class="btn btn--ghost btn--sm history-btn" onclick="openHistoryPanel()">
+        <span>History</span>
         <span class="history-badge" id="historyBadge" style="display:none">0</span>
       </button>
-      <div class="credits-pill">
-        <span class="credits-dot" aria-hidden="true"></span>
-        <span>100% Free Forever ✦</span>
-      </div>
       <a href="#support" class="btn btn--primary btn--sm">Coffee ☕</a>
     </div>
   </div>
 </header>
 
-<!-- ══ HERO ════════════════════════════════════════════ -->
-<section class="hero" id="hero">
+<!-- ══ HERO ══════════════════════════════════════════ -->
+<section class="hero">
   <div class="container">
     <div class="hero__pill">
-      <span class="pulse-dot" aria-hidden="true"></span>
-      Write LinkedIn Posts, Carousels, Comments &amp; Polls Like Top 1% Creators
+      <span class="pulse-dot"></span> Write LinkedIn Posts, Profiles & DMs Like Top 1% Creators
     </div>
+
     <h1 class="hero__h1">
-      LinkedIn Content That<br>
-      <span class="grad">Goes Viral</span>
+      LinkedIn Content<br />
+      <span class="grad">That Goes Viral</span>
     </h1>
+
     <p class="hero__p">
-      AI-powered post generator, carousel maker, comment writer, poll creator &amp; connection message generator.
-      100% Free. No account needed.
+      AI post generator, headline writer, about section builder, 100+ viral hooks, DM generator, content calendar & post analyzer. 100% Free forever.
     </p>
+
     <div class="hero__stats">
-      <div class="stat"><strong>2,400+</strong><span>Active Users</span></div>
+      <div class="stat"><strong>15+</strong><span>AI GROWTH TOOLS</span></div>
       <div class="divider-v"></div>
-      <div class="stat"><strong>48K+</strong><span>Posts Made</span></div>
+      <div class="stat"><strong>50K+</strong><span>POSTS GENERATED</span></div>
       <div class="divider-v"></div>
-      <div class="stat"><strong>3.2×</strong><span>More Engagement</span></div>
+      <div class="stat"><strong>3.2x</strong><span>MORE REACH</span></div>
       <div class="divider-v"></div>
-      <div class="stat"><strong>5</strong><span>AI Tools Free</span></div>
+      <div class="stat"><strong>100%</strong><span>FREE & NO ADS</span></div>
     </div>
+
     <a href="#generator" class="btn btn--hero">Generate Free Content →</a>
   </div>
 </section>
 
-<!-- ══ GENERATOR ════════════════════════════════════════ -->
+<!-- ══ MAIN GENERATOR ════════════════════════════════ -->
 <section class="generator" id="generator">
   <div class="container">
-    <p class="section-tag">ADVANCED AI GENERATOR</p>
-    <h2 class="section-h2">Create Your Post or Carousel</h2>
-
     <div class="gen-wrap">
-
-      <!-- LEFT: Controls -->
+      
+      <!-- LEFT CONTROLS -->
       <div class="gen-left">
-
-        <!-- Input Mode Tabs -->
-        <div class="field">
-          <div class="pay-tabs" style="margin-bottom:8px">
-            <button class="pay-tab pay-tab--active" id="tabModeTopic" onclick="switchInputMode('topic')">💡 Topic / Idea</button>
-            <button class="pay-tab" id="tabModeUrl" onclick="switchInputMode('url')">🔗 YouTube / Web Article URL</button>
-          </div>
-          <label class="field__label" id="inputLabel" for="topicInput">What do you want to post about?</label>
-          <textarea
-            id="topicInput"
-            class="field__textarea"
-            placeholder="e.g. 'I got promoted after 3 years...' or 'Hot take on remote work'"
-            rows="4"
-          ></textarea>
-          <div class="char-count" id="charCount">0 / 500</div>
+        <!-- MODE SELECTOR -->
+        <div class="pay-tabs" style="margin-bottom:16px;">
+          <button id="tabModeTopic" class="pay-tab pay-tab--active" onclick="switchInputMode('topic')">✍️ Topic Mode</button>
+          <button id="tabModeUrl" class="pay-tab" onclick="switchInputMode('url')">🔗 YouTube / URL Mode</button>
         </div>
 
-        <!-- Creator Presets -->
-        <div class="field" id="creators">
-          <label class="field__label">🔥 Top 1% Creator Presets</label>
-          <div class="chips" id="creatorChips" role="radiogroup">
+        <div class="field-grp">
+          <label class="lbl" id="inputLabel" for="topicInput">What do you want to post about?</label>
+          <textarea id="topicInput" class="ta" placeholder="e.g. 'I got promoted after 3 years...' or 'Hot take on remote work'" rows="3"></textarea>
+          <div class="ta-foot">
+            <span class="hint">Be specific for better results</span>
+            <span class="counter" id="charCount">0 / 500</span>
+          </div>
+        </div>
+
+        <!-- STYLE PRESETS -->
+        <div class="field-grp">
+          <label class="lbl">Writing Style Preset</label>
+          <div class="chips" id="creatorChips">
+            <button class="chip chip--on" data-style="storytelling" onclick="selectCreatorStyle('storytelling')" aria-checked="true">📖 Storytelling</button>
             <button class="chip" data-style="justin_welsh" onclick="selectCreatorStyle('justin_welsh')">⚡ Justin Welsh</button>
-            <button class="chip" data-style="sahil_bloom" onclick="selectCreatorStyle('sahil_bloom')">💡 Sahil Bloom</button>
-            <button class="chip" data-style="ruben_hassid" onclick="selectCreatorStyle('ruben_hassid')">🚀 Ruben Hassid</button>
-            <button class="chip" data-style="paul_graham" onclick="selectCreatorStyle('paul_graham')">🧠 Paul Graham</button>
+            <button class="chip" data-style="sahil_bloom" onclick="selectCreatorStyle('sahil_bloom')">🧠 Sahil Bloom</button>
+            <button class="chip" data-style="ruben_hassid" onclick="selectCreatorStyle('ruben_hassid')">🔥 Ruben Hassid</button>
+            <button class="chip" data-style="paul_graham" onclick="selectCreatorStyle('paul_graham')">📜 Paul Graham</button>
           </div>
         </div>
 
-        <!-- Style chips -->
-        <div class="field">
-          <label class="field__label">Post Style</label>
-          <div class="chips" id="styleChips" role="radiogroup">
-            <button class="chip chip--on" data-style="storytelling" role="radio" aria-checked="true">📖 Story</button>
-            <button class="chip" data-style="insight"       role="radio" aria-checked="false">💡 Hot Take</button>
-            <button class="chip" data-style="listicle"      role="radio" aria-checked="false">📋 List</button>
-            <button class="chip" data-style="question"      role="radio" aria-checked="false">🙋 Question</button>
-            <button class="chip" data-style="motivational"  role="radio" aria-checked="false">🚀 Inspire</button>
-            <button class="chip" data-style="casestudy"     role="radio" aria-checked="false">📊 Case Study</button>
+        <!-- TONE & TOGGLES -->
+        <div class="field-row">
+          <div class="field-grp flex-1">
+            <label class="lbl" for="toneSelect">Tone of Voice</label>
+            <select id="toneSelect" class="sel">
+              <option value="casual">💬 Conversational</option>
+              <option value="professional">💼 Professional</option>
+              <option value="bold">🔥 Bold &amp; Direct</option>
+              <option value="empathetic">❤️ Empathetic</option>
+              <option value="data-driven">📊 Data &amp; Evidence</option>
+              <option value="humorous">😄 Witty &amp; Clever</option>
+            </select>
           </div>
         </div>
 
-        <!-- Tone -->
-        <div class="field">
-          <label class="field__label" for="toneSelect">Tone</label>
-          <select id="toneSelect" class="field__select">
-            <option value="casual" selected>Casual &amp; Authentic</option>
-            <option value="professional">Professional &amp; Polished</option>
-            <option value="bold">Bold &amp; Provocative</option>
-            <option value="empathetic">Empathetic &amp; Warm</option>
-            <option value="data-driven">Data-Driven</option>
-            <option value="humorous">Witty &amp; Funny</option>
-          </select>
+        <div class="toggles">
+          <label class="tog-lbl"><input type="checkbox" id="useHook" checked /> ⚡ Scroll-stopping Hook</label>
+          <label class="tog-lbl"><input type="checkbox" id="useEmoji" checked /> 😄 Emojis</label>
+          <label class="tog-lbl"><input type="checkbox" id="useHashtag" checked /> #️⃣ Hashtags</label>
         </div>
 
-        <!-- Toggles -->
-        <div class="field">
-          <label class="field__label">Options</label>
-          <div class="toggles">
-            <label class="toggle">
-              <input type="checkbox" id="useEmoji" checked>
-              <span class="toggle__track" aria-hidden="true"></span>
-              <span>Emojis</span>
-            </label>
-            <label class="toggle">
-              <input type="checkbox" id="useHashtag" checked>
-              <span class="toggle__track" aria-hidden="true"></span>
-              <span>Hashtags</span>
-            </label>
-            <label class="toggle">
-              <input type="checkbox" id="useHook" checked>
-              <span class="toggle__track" aria-hidden="true"></span>
-              <span>Strong Hook</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- Generate Buttons -->
+        <!-- GENERATE BUTTONS -->
         <div class="gen-btns">
-          <button class="btn btn--generate" id="generateBtn" onclick="generatePost()">
-            <span id="genBtnIcon">✦</span>
+          <button id="generateBtn" class="btn btn--generate" onclick="generatePost()">
+            <span id="genBtnIcon">✨</span>
             <span id="genBtnText">Generate Free Post</span>
-            <span class="spinner" id="spinner" style="display:none" aria-hidden="true"></span>
+            <span id="spinner" class="spinner" style="display:none"></span>
           </button>
-          <button class="btn btn--variations" id="variationsBtn" onclick="generateVariations()">
-            <span id="varBtnText">🔁 Generate 3 Variations</span>
-            <span class="spinner" id="varSpinner" style="display:none" aria-hidden="true"></span>
+          <button id="variationsBtn" class="btn btn--variations" onclick="generateVariations()">
+            <span id="varBtnText">🔁 3 Variations</span>
+            <span id="varSpinner" class="spinner" style="display:none"></span>
           </button>
         </div>
-        <p class="credits-hint">✨ 100% Free · Unlimited · No Account Needed</p>
+
+        <!-- HOOK LIBRARY DIRECT LINK -->
+        <button class="btn btn--outline btn--full" style="margin-top:8px;" onclick="openHookLibrary()">
+          🎣 Open 100+ Viral Hook Library
+        </button>
       </div>
 
-      <!-- RIGHT: Output -->
-      <div class="gen-right" id="genRight">
-
-        <!-- Empty state -->
-        <div class="empty-state" id="emptyState">
-          <div class="empty-icon" aria-hidden="true">✦</div>
-          <p>Your LinkedIn post will appear here</p>
-          <span>Fill in the details on the left and hit Generate</span>
+      <!-- RIGHT OUTPUT PREVIEW -->
+      <div class="gen-right">
+        <div id="emptyState" class="empty-state">
+          <div class="empty-state__icon">✨</div>
+          <div class="empty-state__h">Your Viral Post Appears Here</div>
+          <div class="empty-state__p">Select options on the left &amp; click <strong>Generate</strong>. You can directly edit the output text!</div>
         </div>
 
-        <!-- Result -->
-        <div class="result" id="result" style="display:none">
-
-          <!-- LinkedIn preview card -->
-          <div class="li-card">
-            <div class="li-card__head">
-              <div class="li-avatar" aria-hidden="true">👤</div>
-              <div>
-                <strong>Your Name</strong>
-                <p>Your Title · 1st</p>
-                <small>Just now · 🌐</small>
+        <div id="result" class="result-wrap" style="display:none;">
+          <div class="post-preview-card">
+            <!-- PREVIEW HEADER -->
+            <div class="preview-header">
+              <div class="avatar">AY</div>
+              <div class="profile-info">
+                <div class="profile-name">Your Name <span class="badge-creator">Creator</span></div>
+                <div class="profile-headline">Founder &amp; Content Creator • 10k+ followers</div>
+                <div class="post-time">Just now • 🌐</div>
               </div>
             </div>
-            <div class="li-card__body" id="postPreview"></div>
-            <div class="li-card__foot">
-              <span>👍 ❤️ 💡 <strong id="reactions">—</strong></span>
-              <span><strong id="comments">—</strong> comments</span>
+
+            <!-- INLINE EDITABLE PREVIEW (Gap #1 Fix) -->
+            <div id="postPreview" class="post-content" contenteditable="true" spellcheck="false"></div>
+
+            <!-- CHAR LIMIT BAR -->
+            <div id="postCharCount" class="post-char-count"></div>
+
+            <!-- PREVIEW ENGAGEMENT -->
+            <div class="preview-footer">
+              <span class="preview-stat">👍 ❤️ 💡 <strong id="reactions">142</strong></span>
+              <span class="preview-stat"><strong id="comments">38</strong> comments</span>
             </div>
           </div>
 
-          <!-- Bug #4 Fix: LinkedIn Char Limit Indicator -->
-          <div id="postCharCount" class="post-char-count"></div>
+          <!-- SCORES & QUALITY -->
+          <div class="score-grid">
+            <div class="score-card">
+              <div class="score-hdr"><span>Hook Strength</span><strong id="hookNum">0%</strong></div>
+              <div class="score-bar"><div class="score-fill" id="hookFill"></div></div>
+            </div>
+            <div class="score-card">
+              <div class="score-hdr"><span>Readability</span><strong id="readNum">0%</strong></div>
+              <div class="score-bar"><div class="score-fill" id="readFill"></div></div>
+            </div>
+            <div class="score-card">
+              <div class="score-hdr"><span>Engagement</span><strong id="engNum">0%</strong></div>
+              <div class="score-bar"><div class="score-fill" id="engFill"></div></div>
+            </div>
+          </div>
 
-          <!-- Actions -->
+          <!-- ACTIONS -->
           <div class="result-actions">
-            <button class="btn btn--ghost btn--sm" id="copyBtn" onclick="copyPost()">📋 Copy</button>
-            <button class="btn btn--ghost btn--sm" onclick="generatePost()">🔄 Regenerate</button>
-            <button class="btn btn--primary btn--sm" onclick="openCarouselModal()" style="background:linear-gradient(135deg,#A78BFA,#5E5CE6)">🎨 Carousel PDF</button>
-            <a id="liShareBtn" href="#" class="btn btn--li btn--sm" target="_blank" rel="noopener">🔗 Post to LinkedIn</a>
+            <button id="copyBtn" class="btn btn--primary btn--sm" onclick="copyPost()">📋 Copy Text</button>
+            <button class="btn btn--ghost btn--sm" onclick="openCarouselModal()">🎨 Carousel PDF</button>
+            <a id="liShareBtn" class="btn btn--li btn--sm" href="#" target="_blank" rel="noopener">Share on LinkedIn ↗</a>
           </div>
-
-          <!-- Quality scores -->
-          <div class="scores">
-            <div class="score-row">
-              <span class="score-lbl">Hook</span>
-              <div class="score-track"><div class="score-fill" id="hookFill"></div></div>
-              <span class="score-num" id="hookNum">—</span>
-            </div>
-            <div class="score-row">
-              <span class="score-lbl">Readability</span>
-              <div class="score-track"><div class="score-fill" id="readFill"></div></div>
-              <span class="score-num" id="readNum">—</span>
-            </div>
-            <div class="score-row">
-              <span class="score-lbl">Engagement</span>
-              <div class="score-track"><div class="score-fill" id="engFill"></div></div>
-              <span class="score-num" id="engNum">—</span>
-            </div>
-          </div>
-
         </div>
       </div>
 
@@ -259,257 +225,522 @@
   </div>
 </section>
 
-<!-- ══ AI TOOLS SECTION (New Features) ════════════════════ -->
+<!-- ══ ALL AI TOOLS TABS ═════════════════════════════ -->
 <section class="ai-tools-section" id="ai-tools">
   <div class="container">
-    <p class="section-tag">5 FREE AI TOOLS</p>
-    <h2 class="section-h2">All-in-One LinkedIn AI Toolkit</h2>
-    <p class="section-sub">Everything you need to grow on LinkedIn — completely free</p>
-
-    <div class="tools-tabs" id="toolsTabs">
-      <button class="tool-tab tool-tab--active" onclick="switchTool('comment')">💬 Comment Generator</button>
-      <button class="tool-tab" onclick="switchTool('connection')">🤝 Connection Message</button>
-      <button class="tool-tab" onclick="switchTool('poll')">📊 Poll Generator</button>
+    <div class="section-tag">COMPLETE LINKEDIN SUITE</div>
+    <h2 class="section-h2">Supercharge Your LinkedIn Profile &amp; Reach</h2>
+    
+    <div class="tools-tabs">
+      <button class="tool-tab tool-tab--active" onclick="switchTool('headline')">✨ Headline Generator</button>
+      <button class="tool-tab" onclick="switchTool('about')">✍️ About Section</button>
+      <button class="tool-tab" onclick="switchTool('dm')">✉️ DM Templates</button>
+      <button class="tool-tab" onclick="switchTool('repurpose')">🔄 Content Repurposer</button>
+      <button class="tool-tab" onclick="switchTool('calendar')">📅 7-Day Calendar</button>
+      <button class="tool-tab" onclick="switchTool('analyze')">🔍 Post Analyzer</button>
+      <button class="tool-tab" onclick="switchTool('hashtags')">#️⃣ Hashtag Finder</button>
+      <button class="tool-tab" onclick="switchTool('transform')">⚡ Before/After</button>
+      <button class="tool-tab" onclick="switchTool('analytics')">📊 Growth Dashboard</button>
+      <button class="tool-tab" onclick="switchTool('comments')">💬 Comment Writer</button>
+      <button class="tool-tab" onclick="switchTool('connection')">🤝 Connection Request</button>
+      <button class="tool-tab" onclick="switchTool('polls')">📊 Poll Maker</button>
     </div>
 
-    <!-- TOOL: Comment Generator -->
-    <div class="tool-panel tool-panel--active" id="tool-comment">
-      <div class="tool-inner">
-        <div class="tool-left">
-          <h3 class="tool-title">💬 LinkedIn Comment Generator</h3>
-          <p class="tool-desc">Paste anyone's LinkedIn post below. AI will write 3 smart, engagement-driving comments that add real value.</p>
-          <div class="field">
-            <label class="field__label" for="commentPostInput">Paste LinkedIn Post Here:</label>
-            <textarea id="commentPostInput" class="field__textarea" rows="5" placeholder="Paste the LinkedIn post text you want to comment on..."></textarea>
+    <!-- PANELS -->
+    <div class="tools-container">
+
+      <!-- TOOL 1: HEADLINE GENERATOR -->
+      <div id="tool-headline" class="tool-panel tool-panel--active">
+        <div class="tool-inner">
+          <div class="tool-left">
+            <h3>✨ LinkedIn Profile Headline Generator</h3>
+            <p>Generate 5 high-converting headlines that make recruiters &amp; clients click your profile.</p>
+            <div class="field-grp">
+              <label class="lbl">Your Name (Optional)</label>
+              <input id="hlName" class="inp" placeholder="e.g. Alex Rivera" />
+            </div>
+            <div class="field-grp">
+              <label class="lbl">Current Role / Title *</label>
+              <input id="hlRole" class="inp" placeholder="e.g. Senior Software Engineer" />
+            </div>
+            <div class="field-grp">
+              <label class="lbl">Target Role or Niche</label>
+              <input id="hlTarget" class="inp" placeholder="e.g. Fullstack AI Apps / SaaS Founders" />
+            </div>
+            <div class="field-grp">
+              <label class="lbl">Top Skills / Technologies</label>
+              <input id="hlSkills" class="inp" placeholder="e.g. React, Node.js, System Design" />
+            </div>
+            <div class="field-grp">
+              <label class="lbl">Unique Superpower / Result</label>
+              <input id="hlSuper" class="inp" placeholder="e.g. Helped 3 startups scale to $1M ARR" />
+            </div>
+            <button id="hlBtn" class="btn btn--primary btn--full" onclick="generateHeadlines()">
+              <span id="hlBtnText">✨ Generate 5 Headlines</span>
+              <span id="hlSpinner" class="spinner" style="display:none"></span>
+            </button>
           </div>
-          <button class="btn btn--generate" id="commentBtn" onclick="generateComments()">
-            <span id="commentBtnText">💬 Generate 3 Smart Comments</span>
-            <span class="spinner" id="commentSpinner" style="display:none"></span>
-          </button>
-        </div>
-        <div class="tool-right">
-          <div id="commentResults" class="results-grid" style="display:none"></div>
-          <div class="tool-empty" id="commentEmpty">
-            <div class="empty-icon">💬</div>
-            <p>Paste a post on the left and generate smart comments</p>
+          <div class="tool-right">
+            <div id="hlEmpty" class="tool-empty">Enter your details and click generate to get 5 LinkedIn headlines!</div>
+            <div id="hlResults" class="results-grid" style="display:none"></div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- TOOL: Connection Request Generator -->
-    <div class="tool-panel" id="tool-connection">
-      <div class="tool-inner">
-        <div class="tool-left">
-          <h3 class="tool-title">🤝 Connection Request Generator</h3>
-          <p class="tool-desc">Generate personalized 300-char connection messages. Personalized notes get 3× more acceptances than generic requests.</p>
-          <div class="field">
-            <label class="field__label" for="connName">Their Name:</label>
-            <input type="text" id="connName" class="field__input" placeholder="e.g. Rahul Sharma" />
+      <!-- TOOL 2: ABOUT SECTION -->
+      <div id="tool-about" class="tool-panel">
+        <div class="tool-inner">
+          <div class="tool-left">
+            <h3>✍️ LinkedIn About / Bio Section Writer</h3>
+            <p>Write a compelling 2600-character About section that tells your story and converts readers.</p>
+            <div class="field-grp">
+              <label class="lbl">Current Role *</label>
+              <input id="abtRole" class="inp" placeholder="e.g. Product Manager at Tech Co" />
+            </div>
+            <div class="field-grp">
+              <label class="lbl">Years of Experience</label>
+              <input id="abtExp" class="inp" placeholder="e.g. 5+ years" />
+            </div>
+            <div class="field-grp">
+              <label class="lbl">Key Skills &amp; Domain Expertise</label>
+              <input id="abtSkills" class="inp" placeholder="e.g. UX Research, Agile, Roadmap, Growth" />
+            </div>
+            <div class="field-grp">
+              <label class="lbl">Key Achievements</label>
+              <textarea id="abtAchieve" class="ta" rows="2" placeholder="e.g. Led redesign increasing conversion by 40%"></textarea>
+            </div>
+            <div class="field-row">
+              <div class="field-grp flex-1">
+                <label class="lbl">Target Audience</label>
+                <input id="abtAudience" class="inp" placeholder="e.g. Recruiters, SaaS Founders" />
+              </div>
+              <div class="field-grp flex-1">
+                <label class="lbl">Tone</label>
+                <select id="abtTone" class="sel">
+                  <option value="professional">Professional</option>
+                  <option value="casual">Conversational</option>
+                  <option value="bold">Bold Founder</option>
+                </select>
+              </div>
+            </div>
+            <button id="abtBtn" class="btn btn--primary btn--full" onclick="generateAbout()">
+              <span id="abtBtnText">✍️ Write My About Section</span>
+              <span id="abtSpinner" class="spinner" style="display:none"></span>
+            </button>
           </div>
-          <div class="field">
-            <label class="field__label" for="connRole">Their Role / Industry:</label>
-            <input type="text" id="connRole" class="field__input" placeholder="e.g. Product Manager at Google" />
-          </div>
-          <div class="field">
-            <label class="field__label" for="connReason">Why do you want to connect? (optional):</label>
-            <input type="text" id="connReason" class="field__input" placeholder="e.g. I loved your post on AI trends" />
-          </div>
-          <button class="btn btn--generate" id="connBtn" onclick="generateConnectionMsgs()">
-            <span id="connBtnText">🤝 Generate 3 Connection Messages</span>
-            <span class="spinner" id="connSpinner" style="display:none"></span>
-          </button>
-        </div>
-        <div class="tool-right">
-          <div id="connResults" class="results-grid" style="display:none"></div>
-          <div class="tool-empty" id="connEmpty">
-            <div class="empty-icon">🤝</div>
-            <p>Fill in the details and generate personalized connection messages</p>
+          <div class="tool-right">
+            <div id="abtEmpty" class="tool-empty">Your high-converting About section will appear here!</div>
+            <div id="abtResult" style="display:none"></div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- TOOL: Poll Generator -->
-    <div class="tool-panel" id="tool-poll">
-      <div class="tool-inner">
-        <div class="tool-left">
-          <h3 class="tool-title">📊 LinkedIn Poll Generator</h3>
-          <p class="tool-desc">LinkedIn polls get 5× more engagement than regular posts. Generate 3 viral poll ideas with options instantly.</p>
-          <div class="field">
-            <label class="field__label" for="pollTopicInput">Poll Topic / Niche:</label>
-            <input type="text" id="pollTopicInput" class="field__input" placeholder="e.g. Remote work vs office work, AI replacing jobs, Best programming language..." />
+      <!-- TOOL 3: DM GENERATOR -->
+      <div id="tool-dm" class="tool-panel">
+        <div class="tool-inner">
+          <div class="tool-left">
+            <h3>✉️ LinkedIn DM &amp; InMail Generator</h3>
+            <p>Write personalized, non-salesy DMs that get high response rates.</p>
+            <div class="field-grp">
+              <label class="lbl">Recipient Name *</label>
+              <input id="dmName" class="inp" placeholder="e.g. Sarah Jenkins" />
+            </div>
+            <div class="field-grp">
+              <label class="lbl">Company / Role</label>
+              <input id="dmCompany" class="inp" placeholder="e.g. Head of Engineering at Stripe" />
+            </div>
+            <div class="field-grp">
+              <label class="lbl">Purpose of Message</label>
+              <select id="dmPurpose" class="sel">
+                <option value="job">Job Inquiry / Referral Request</option>
+                <option value="sales">Warm Sales Outreach</option>
+                <option value="collab">Partnership / Collaboration</option>
+                <option value="podcast">Podcast / Interview Guest</option>
+                <option value="mentor">Mentorship / Advice Ask</option>
+                <option value="followup">Follow up after meeting</option>
+              </select>
+            </div>
+            <div class="field-grp">
+              <label class="lbl">Context / Personal Touch</label>
+              <textarea id="dmContext" class="ta" rows="2" placeholder="e.g. Saw her post about scaling Node.js services last week"></textarea>
+            </div>
+            <button id="dmBtn" class="btn btn--primary btn--full" onclick="generateDMs()">
+              <span id="dmBtnText">✉️ Generate 3 DM Templates</span>
+              <span id="dmSpinner" class="spinner" style="display:none"></span>
+            </button>
           </div>
-          <button class="btn btn--generate" id="pollBtn" onclick="generatePolls()">
-            <span id="pollBtnText">📊 Generate 3 Poll Ideas</span>
-            <span class="spinner" id="pollSpinner" style="display:none"></span>
-          </button>
-        </div>
-        <div class="tool-right">
-          <div id="pollResults" class="results-grid" style="display:none"></div>
-          <div class="tool-empty" id="pollEmpty">
-            <div class="empty-icon">📊</div>
-            <p>Enter your topic and generate viral poll ideas</p>
+          <div class="tool-right">
+            <div id="dmEmpty" class="tool-empty">Your personalized DMs will appear here!</div>
+            <div id="dmResults" class="results-grid" style="display:none"></div>
           </div>
         </div>
       </div>
+
+      <!-- TOOL 4: CONTENT REPURPOSER -->
+      <div id="tool-repurpose" class="tool-panel">
+        <div class="tool-inner">
+          <div class="tool-left">
+            <h3>🔄 Content Repurposer</h3>
+            <p>Paste a blog post, tweet thread or video script → turn into 4 LinkedIn formats.</p>
+            <div class="field-grp">
+              <label class="lbl">Source Content *</label>
+              <textarea id="repurposeInput" class="ta" rows="6" placeholder="Paste your blog, newsletter, tweet thread or transcript here..."></textarea>
+            </div>
+            <div class="field-grp">
+              <label class="lbl">Source Type</label>
+              <select id="repurposeSource" class="sel">
+                <option value="blog">Blog Article</option>
+                <option value="twitter">Twitter / X Thread</option>
+                <option value="newsletter">Newsletter</option>
+                <option value="youtube">YouTube Script</option>
+              </select>
+            </div>
+            <button id="repurposeBtn" class="btn btn--primary btn--full" onclick="generateRepurpose()">
+              <span id="repurposeBtnText">🔄 Repurpose to LinkedIn</span>
+              <span id="repurposeSpinner" class="spinner" style="display:none"></span>
+            </button>
+          </div>
+          <div class="tool-right">
+            <div id="repurposeEmpty" class="tool-empty">Post, Carousel, Poll &amp; Comment starter will appear here!</div>
+            <div id="repurposeResults" class="results-grid" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOL 5: 7-DAY CONTENT CALENDAR -->
+      <div id="tool-calendar" class="tool-panel">
+        <div class="tool-inner">
+          <div class="tool-left">
+            <h3>📅 7-Day LinkedIn Content Calendar</h3>
+            <p>Get a complete week of post ideas tailored to your industry &amp; goals.</p>
+            <div class="field-grp">
+              <label class="lbl">Industry / Niche *</label>
+              <input id="calIndustry" class="inp" placeholder="e.g. B2B SaaS, Digital Marketing, AI" />
+            </div>
+            <div class="field-grp">
+              <label class="lbl">Your Role</label>
+              <input id="calRole" class="inp" placeholder="e.g. Founder, Freelancer, Jobseeker" />
+            </div>
+            <div class="field-grp">
+              <label class="lbl">Primary Goal</label>
+              <input id="calGoal" class="inp" placeholder="e.g. Get inbound leads, build authority" />
+            </div>
+            <button id="calBtn" class="btn btn--primary btn--full" onclick="generateCalendar()">
+              <span id="calBtnText">📅 Generate 7-Day Calendar</span>
+              <span id="calSpinner" class="spinner" style="display:none"></span>
+            </button>
+          </div>
+          <div class="tool-right">
+            <div id="calEmpty" class="tool-empty">Your 7-day content strategy will appear here!</div>
+            <div id="calResults" class="results-grid" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOL 6: POST ANALYZER -->
+      <div id="tool-analyze" class="tool-panel">
+        <div class="tool-inner">
+          <div class="tool-left">
+            <h3>🔍 LinkedIn Post Analyzer</h3>
+            <p>Paste any LinkedIn post draft to get AI score, feedback &amp; an improved version.</p>
+            <div class="field-grp">
+              <label class="lbl">Paste Your Draft *</label>
+              <textarea id="analyzeInput" class="ta" rows="6" placeholder="Paste your post draft here to analyze..."></textarea>
+            </div>
+            <button id="analyzeBtn" class="btn btn--primary btn--full" onclick="analyzePost()">
+              <span id="analyzeBtnText">🔍 Analyze My Post</span>
+              <span id="analyzeSpinner" class="spinner" style="display:none"></span>
+            </button>
+          </div>
+          <div class="tool-right">
+            <div id="analyzeEmpty" class="tool-empty">Detailed scores &amp; improved post will appear here!</div>
+            <div id="analyzeResults" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOL 7: HASHTAG RESEARCH -->
+      <div id="tool-hashtags" class="tool-panel">
+        <div class="tool-inner">
+          <div class="tool-left">
+            <h3>#️⃣ LinkedIn Hashtag Research Tool</h3>
+            <p>Find 20 optimal high, mid &amp; niche hashtags for maximum reach.</p>
+            <div class="field-grp">
+              <label class="lbl">Post Topic / Industry *</label>
+              <input id="hashtagInput" class="inp" placeholder="e.g. Artificial Intelligence in Healthcare" />
+            </div>
+            <button id="hashtagBtn" class="btn btn--primary btn--full" onclick="generateHashtags()">
+              <span id="hashtagBtnText">🔍 Research Hashtags</span>
+              <span id="hashtagSpinner" class="spinner" style="display:none"></span>
+            </button>
+          </div>
+          <div class="tool-right">
+            <div id="hashtagEmpty" class="tool-empty">Categorized LinkedIn hashtags will appear here!</div>
+            <div id="hashtagResults" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOL 8: BEFORE/AFTER TRANSFORMER -->
+      <div id="tool-transform" class="tool-panel">
+        <div class="tool-inner">
+          <div class="tool-left">
+            <h3>⚡ Before / After Post Transformer</h3>
+            <p>Turn a boring, corporate post into a high-engagement viral post.</p>
+            <div class="field-grp">
+              <label class="lbl">Boring Post Draft *</label>
+              <textarea id="transformInput" class="ta" rows="6" placeholder="Paste boring draft here..."></textarea>
+            </div>
+            <button id="transformBtn" class="btn btn--primary btn--full" onclick="transformPost()">
+              <span id="transformBtnText">⚡ Transform My Post</span>
+              <span id="transformSpinner" class="spinner" style="display:none"></span>
+            </button>
+          </div>
+          <div class="tool-right">
+            <div id="transformEmpty" class="tool-empty">Side-by-side comparison will appear here!</div>
+            <div id="transformResults" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOL 9: GROWTH DASHBOARD -->
+      <div id="tool-analytics" class="tool-panel">
+        <div class="tool-inner">
+          <div class="tool-left">
+            <h3>📊 Creator Analytics &amp; Tips</h3>
+            <p>Enter your recent post stats to calculate engagement rate &amp; get growth tips.</p>
+            <div id="analyticsList" class="analytics-inputs"></div>
+            <button class="btn btn--ghost btn--full" style="margin-bottom:10px" onclick="addAnalyticsRow()">+ Add Post Stats</button>
+            <button class="btn btn--primary btn--full" onclick="calculateAnalytics()">📊 Calculate My Engagement Rate</button>
+          </div>
+          <div class="tool-right">
+            <div id="analyticsResults" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOL 10: COMMENT WRITER -->
+      <div id="tool-comments" class="tool-panel">
+        <div class="tool-inner">
+          <div class="tool-left">
+            <h3>💬 Smart Comment Generator</h3>
+            <p>Paste any LinkedIn post to generate 3 high-value comments that build relationships.</p>
+            <div class="field-grp">
+              <label class="lbl">Post Content *</label>
+              <textarea id="commentPostInput" class="ta" rows="5" placeholder="Paste LinkedIn post here..."></textarea>
+            </div>
+            <button id="commentBtn" class="btn btn--primary btn--full" onclick="generateComments()">
+              <span id="commentBtnText">💬 Generate 3 Smart Comments</span>
+              <span id="commentSpinner" class="spinner" style="display:none"></span>
+            </button>
+          </div>
+          <div class="tool-right">
+            <div id="commentEmpty" class="tool-empty">Generated comments will appear here!</div>
+            <div id="commentResults" class="results-grid" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOL 11: CONNECTION REQUEST -->
+      <div id="tool-connection" class="tool-panel">
+        <div class="tool-inner">
+          <div class="tool-left">
+            <h3>🤝 Connection Request Message Generator</h3>
+            <p>Generate 3 personalized messages under 300 characters.</p>
+            <div class="field-grp">
+              <label class="lbl">Person's Name *</label>
+              <input id="connName" class="inp" placeholder="e.g. Priya Sharma" />
+            </div>
+            <div class="field-grp">
+              <label class="lbl">Role / Industry *</label>
+              <input id="connRole" class="inp" placeholder="e.g. VP of Product at Tech Startup" />
+            </div>
+            <div class="field-grp">
+              <label class="lbl">Reason for Connecting</label>
+              <input id="connReason" class="inp" placeholder="e.g. Loved her recent post on product roadmaps" />
+            </div>
+            <button id="connBtn" class="btn btn--primary btn--full" onclick="generateConnectionMsgs()">
+              <span id="connBtnText">🤝 Generate 3 Connection Messages</span>
+              <span id="connSpinner" class="spinner" style="display:none"></span>
+            </button>
+          </div>
+          <div class="tool-right">
+            <div id="connEmpty" class="tool-empty">Connection messages under 300 chars will appear here!</div>
+            <div id="connResults" class="results-grid" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOL 12: POLL MAKER -->
+      <div id="tool-polls" class="tool-panel">
+        <div class="tool-inner">
+          <div class="tool-left">
+            <h3>📊 LinkedIn Poll Generator</h3>
+            <p>Create 3 viral poll ideas with 4 options each.</p>
+            <div class="field-grp">
+              <label class="lbl">Poll Topic *</label>
+              <input id="pollTopicInput" class="inp" placeholder="e.g. Remote work vs office, salary transparency" />
+            </div>
+            <button id="pollBtn" class="btn btn--primary btn--full" onclick="generatePolls()">
+              <span id="pollBtnText">📊 Generate 3 Poll Ideas</span>
+              <span id="pollSpinner" class="spinner" style="display:none"></span>
+            </button>
+          </div>
+          <div class="tool-right">
+            <div id="pollEmpty" class="tool-empty">Poll questions &amp; options will appear here!</div>
+            <div id="pollResults" class="results-grid" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
 
-<!-- ══ TEMPLATES ════════════════════════════════════════ -->
+<!-- ══ TEMPLATES PRESET GALLERY ═══════════════════════ -->
 <section class="templates" id="templates">
   <div class="container">
-    <p class="section-tag">TEMPLATES</p>
-    <h2 class="section-h2">Proven Post Formulas</h2>
-    <p class="section-sub">Click any template to instantly fill the generator</p>
+    <div class="section-tag">POPULAR FRAMEWORKS</div>
+    <h2 class="section-h2">Proven LinkedIn Content Templates</h2>
     <div class="templates-grid" id="templatesGrid"></div>
   </div>
 </section>
 
-<!-- ══ RECOMMENDED TOOLS ════════════════════════════════ -->
-<section class="templates" id="tools" style="border-top:1px solid var(--border)">
+<!-- ══ SUPPORT SECTION ═══════════════════════════════ -->
+<section class="support-section" id="support">
   <div class="container">
-    <p class="section-tag">MONETIZED RESOURCES</p>
-    <h2 class="section-h2">Recommended Growth Tools</h2>
-    <p class="section-sub">Essential tools top LinkedIn creators use to grow 10x faster</p>
-    <div class="templates-grid">
-      <a href="https://canva.com" target="_blank" rel="noopener noreferrer" class="tcard" style="text-decoration:none">
-        <span class="tcard__emoji">🎨</span>
-        <div class="tcard__title">Canva Pro</div>
-        <div class="tcard__desc">Create stunning LinkedIn carousel slides, banners, and graphics in 2 minutes.</div>
-        <div class="tcard__cta">Try Canva Pro Free →</div>
-      </a>
-      <a href="https://taplio.com" target="_blank" rel="noopener noreferrer" class="tcard" style="text-decoration:none">
-        <span class="tcard__emoji">📈</span>
-        <div class="tcard__title">Taplio</div>
-        <div class="tcard__desc">Schedule LinkedIn posts, automate outreach, and analyze detailed profile metrics.</div>
-        <div class="tcard__cta">Explore Taplio →</div>
-      </a>
-      <a href="https://hostinger.com" target="_blank" rel="noopener noreferrer" class="tcard" style="text-decoration:none">
-        <span class="tcard__emoji">🌐</span>
-        <div class="tcard__title">Hostinger Portfolio</div>
-        <div class="tcard__desc">Build a personal brand website with free custom domain and fast hosting.</div>
-        <div class="tcard__cta">Get 75% Off Hosting →</div>
-      </a>
-      <a href="https://notion.so" target="_blank" rel="noopener noreferrer" class="tcard" style="text-decoration:none">
-        <span class="tcard__emoji">📝</span>
-        <div class="tcard__title">Notion Content Planner</div>
-        <div class="tcard__desc">Organize your post ideas, content calendar, and personal branding pipeline.</div>
-        <div class="tcard__cta">Get Free Template →</div>
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- ══ SUPPORT & CONSULTING ════════════════════════════ -->
-<section class="pricing" id="support">
-  <div class="container">
-    <p class="section-tag">SUPPORT &amp; SERVICES</p>
-    <h2 class="section-h2">Love This Free Tool?</h2>
-    <div class="plans" style="grid-template-columns: 1fr 1fr;">
-      <div class="plan plan--featured">
-        <div class="plan__badge">100% Optional</div>
-        <div class="plan__name">Buy Me a Coffee ☕</div>
-        <div class="plan__price"><strong>₹50 - ₹500</strong><span> / any amount</span></div>
-        <div class="plan__note">Help us keep PostCraft AI 100% Free for everyone!</div>
-        <ul class="plan__features">
-          <li class="yes">Keeps servers running fast</li>
-          <li class="yes">Supports open-source free AI tools</li>
-          <li class="yes">Instant UPI transfer (GPay/PhonePe/Paytm)</li>
-        </ul>
-        <div class="upi-box" style="margin-top:14px;padding:12px">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=upi://pay?pa=7058227634@superyes%26pn=PostCraftSupport%26cu=INR" alt="UPI QR Code" style="width:120px;height:120px;background:#fff;padding:6px;border-radius:8px" />
-          <p style="font-size:0.75rem;color:var(--t2);margin-top:6px">UPI: <strong>7058227634@superyes</strong></p>
+    <div class="support-card">
+      <div class="support-card__left">
+        <h2>💖 100% Free Forever</h2>
+        <p>PostCraft AI is completely free without limits or ads. If this tool saves you time or helps your career, feel free to support via UPI / WhatsApp!</p>
+        <div class="upi-box">
+          <span class="upi-lbl">UPI ID:</span>
+          <strong class="upi-val">7058227634@superyes</strong>
         </div>
       </div>
-      <div class="plan">
-        <div class="plan__name">LinkedIn Profile Optimization 💼</div>
-        <div class="plan__price"><strong>₹1,499</strong><span> / one-time</span></div>
-        <div class="plan__note">High-converting personal branding package</div>
-        <ul class="plan__features">
-          <li class="yes">Complete Headline &amp; About Section Rewrite</li>
-          <li class="yes">Custom Banner Design guidance</li>
-          <li class="yes">SEO keyword optimization for job/client leads</li>
-          <li class="yes">1-on-1 strategy audit call</li>
-        </ul>
-        <a href="https://wa.me/919860663661?text=Hi!%20I%20want%20LinkedIn%20Profile%20Optimization%20Service" target="_blank" rel="noopener noreferrer" class="btn btn--primary btn--full" style="text-decoration:none;margin-top:auto">
-          Book Audit on WhatsApp →
+      <div class="support-card__right">
+        <a href="https://wa.me/919860663661?text=Hi!%20I%20love%20PostCraft%20AI" target="_blank" rel="noopener" class="btn btn--hero" style="background:#25D366;box-shadow:0 6px 24px rgba(37,211,102,.3)">
+          📱 WhatsApp Support: 9860663661
         </a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══ CAROUSEL SLIDES MODAL ════════════════════════════ -->
-<div class="overlay" id="carouselOverlay" style="display:none" role="dialog" aria-modal="true">
-  <div class="modal" style="max-width:700px">
-    <button class="modal__x" onclick="closeCarouselModal()" aria-label="Close">✕</button>
-    <div class="modal__spark" aria-hidden="true">🎨</div>
-    <h3 class="modal__h3">LinkedIn Carousel Slide Generator</h3>
-    <p class="modal__sub">Your post transformed into high-converting carousel slides</p>
-    <div class="carousel-preview-container" id="carouselSlidesContainer"></div>
-    <div style="display:flex;gap:10px;margin-top:16px">
-      <button class="btn btn--primary btn--full" onclick="printCarouselPdf()">🖨️ Save / Print as PDF Carousel</button>
-      <button class="btn btn--ghost btn--full" onclick="closeCarouselModal()">Close</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ VARIATIONS MODAL ══════════════════════════════════ -->
-<div class="overlay" id="variationsOverlay" style="display:none" role="dialog" aria-modal="true">
-  <div class="modal" style="max-width:780px">
-    <button class="modal__x" onclick="closeVariationsModal()" aria-label="Close">✕</button>
-    <div class="modal__spark" aria-hidden="true">🔁</div>
-    <h3 class="modal__h3">3 Post Variations</h3>
-    <p class="modal__sub">Pick the best version for your audience</p>
-    <div id="variationsContainer" class="variations-container"></div>
-    <button class="btn btn--ghost btn--full" onclick="closeVariationsModal()" style="margin-top:12px">Close</button>
-  </div>
-</div>
-
-<!-- ══ HISTORY PANEL OVERLAY ════════════════════════════ -->
-<div class="overlay" id="historyOverlay" style="display:none" role="dialog" aria-modal="true">
-  <div class="modal" style="max-width:600px">
-    <button class="modal__x" onclick="closeHistoryPanel()" aria-label="Close">✕</button>
-    <div class="modal__spark" aria-hidden="true">🕐</div>
-    <h3 class="modal__h3">My Post History</h3>
-    <p class="modal__sub">Last 15 generated posts — click any to restore</p>
-    <div id="historyList" class="history-list"></div>
-    <div style="display:flex;gap:10px;margin-top:16px">
-      <button class="btn btn--ghost btn--full" onclick="clearHistory()" style="color:var(--red)">🗑️ Clear History</button>
-      <button class="btn btn--ghost btn--full" onclick="closeHistoryPanel()">Close</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ TOAST ════════════════════════════════════════════ -->
-<div class="toast" id="toast" role="alert" style="display:none"></div>
-
-<!-- ══ FOOTER ═══════════════════════════════════════════ -->
+<!-- ══ FOOTER ═════════════════════════════════════════ -->
 <footer class="footer">
   <div class="container footer__inner">
-    <div class="footer__logo">PostCraft <em>AI</em></div>
-    <nav class="footer__nav">
+    <div class="logo">
+      <span>PostCraft <em>AI</em></span>
+    </div>
+    <div class="footer__nav">
       <a href="#generator">Generator</a>
-      <a href="#ai-tools">AI Tools</a>
+      <a href="#ai-tools">All AI Tools</a>
       <a href="#templates">Templates</a>
-      <a href="#tools">Growth Tools</a>
-      <a href="#support">Support Us</a>
-    </nav>
-    <p>© 2025 PostCraft AI · 100% Free AI Tool for Everyone</p>
+      <a href="#" onclick="openHookLibrary();return false;">Hook Library</a>
+      <a href="#" onclick="openHistoryPanel();return false;">History</a>
+    </div>
+    <p>© 2026 PostCraft AI • Built for creators, founders &amp; professionals.</p>
   </div>
 </footer>
 
+<!-- ══════════════════════════════════════════
+   MODALS & OVERLAYS
+══════════════════════════════════════════ -->
+
+<!-- GAP #5: ONBOARDING OVERLAY -->
+<div id="onboardingOverlay" class="overlay" style="display:none;">
+  <div class="modal modal--onboard">
+    <div class="modal__h3">👋 Welcome to PostCraft AI!</div>
+    <p class="modal__p">The ultimate 100% free LinkedIn growth suite. Here's how to create viral content in 3 steps:</p>
+    <div class="onboard-steps">
+      <div class="onboard-step">
+        <div class="onboard-step__num">1</div>
+        <div><strong>Enter your topic or paste a URL</strong> (YouTube video / Article)</div>
+      </div>
+      <div class="onboard-step">
+        <div class="onboard-step__num">2</div>
+        <div><strong>Choose your style preset</strong> (Justin Welsh, Sahil Bloom, Storytelling)</div>
+      </div>
+      <div class="onboard-step">
+        <div class="onboard-step__num">3</div>
+        <div><strong>Click Generate &amp; edit directly!</strong> Download carousel PDF or PNG with one click</div>
+      </div>
+    </div>
+    <button class="btn btn--primary btn--full" onclick="closeOnboarding()">Let's Write Viral Posts! 🚀</button>
+  </div>
+</div>
+
+<!-- 3 VARIATIONS OVERLAY -->
+<div id="variationsOverlay" class="overlay" style="display:none;">
+  <div class="modal modal--lg">
+    <div class="modal__head">
+      <div class="modal__h3">🔁 3 LinkedIn Post Variations</div>
+      <button class="modal__close" onclick="closeVariationsModal()">✕</button>
+    </div>
+    <div id="variationsContainer" class="variations-container"></div>
+  </div>
+</div>
+
+<!-- CAROUSEL OVERLAY (GAP #6: PDF + PNG Buttons) -->
+<div id="carouselOverlay" class="overlay" style="display:none;">
+  <div class="modal modal--lg">
+    <div class="modal__head">
+      <div class="modal__h3">🎨 LinkedIn Carousel Preview</div>
+      <button class="modal__close" onclick="closeCarouselModal()">✕</button>
+    </div>
+    <p class="modal__p" style="margin-bottom:14px">Your post auto-converted into a multi-slide carousel!</p>
+    <div class="carousel-preview-container" id="carouselSlidesContainer"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+      <button class="btn btn--primary" onclick="printCarouselPdf()">🖨️ Download PDF Carousel</button>
+      <button class="btn btn--ghost" onclick="downloadCarouselPng()">📷 Download PNG Carousel (Mobile Friendly)</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIRAL HOOK LIBRARY OVERLAY -->
+<div id="hookLibraryOverlay" class="overlay" style="display:none;">
+  <div class="modal modal--lg">
+    <div class="modal__head">
+      <div class="modal__h3">🎣 100+ Proven Viral LinkedIn Hooks</div>
+      <button class="modal__close" onclick="closeHookLibrary()">✕</button>
+    </div>
+    
+    <div class="hook-cat-bar">
+      <button class="hook-cat-btn hook-cat-btn--active" data-cat="story" onclick="switchHookCategory('story')">📖 Story</button>
+      <button class="hook-cat-btn" data-cat="insight" onclick="switchHookCategory('insight')">🔥 Hot Take</button>
+      <button class="hook-cat-btn" data-cat="listicle" onclick="switchHookCategory('listicle')">📋 Listicle</button>
+      <button class="hook-cat-btn" data-cat="data" onclick="switchHookCategory('data')">📊 Data/Stats</button>
+      <button class="hook-cat-btn" data-cat="question" onclick="switchHookCategory('question')">❓ Question</button>
+      <button class="hook-cat-btn" data-cat="curiosity" onclick="switchHookCategory('curiosity')">💡 Curiosity</button>
+      <button class="hook-cat-btn" data-cat="fear" onclick="switchHookCategory('fear')">⚠️ Fear/Urgency</button>
+    </div>
+
+    <input type="text" id="hookSearch" class="inp" placeholder="Search hooks..." oninput="filterHooks()" style="margin-bottom:14px;" />
+
+    <div id="hookGrid" class="hook-grid"></div>
+  </div>
+</div>
+
+<!-- HISTORY OVERLAY (GAP #4: Export / Import Added) -->
+<div id="historyOverlay" class="overlay" style="display:none;">
+  <div class="modal">
+    <div class="modal__head">
+      <div class="modal__h3">📜 Post History</div>
+      <button class="modal__close" onclick="closeHistoryPanel()">✕</button>
+    </div>
+    <div id="historyList" class="history-list"></div>
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <button class="btn btn--ghost btn--sm" onclick="exportHistory()">💾 Export Backup</button>
+      <button class="btn btn--ghost btn--sm" onclick="importHistory()">📥 Import Backup</button>
+      <button class="btn btn--outline btn--sm" onclick="clearHistory()" style="margin-left:auto;color:var(--red)">🗑️ Clear</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST NOTIFICATION -->
+<div id="toast" class="toast" style="display:none;"></div>
+
 <script src="app.js"></script>
-<script>
-  // Tool tabs switcher
-  function switchTool(tool) {
-    document.querySelectorAll('.tool-tab').forEach(t => t.classList.remove('tool-tab--active'));
-    document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('tool-panel--active'));
-    event.target.classList.add('tool-tab--active');
-    document.getElementById('tool-' + tool)?.classList.add('tool-panel--active');
-  }
-</script>
 </body>
 </html>
