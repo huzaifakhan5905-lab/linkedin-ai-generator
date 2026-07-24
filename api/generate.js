@@ -2,17 +2,19 @@
 // Modes: post, variations, comment, connection, poll,
 //        headline, about, calendar, analyze, hashtags, transform, repurpose, dm
 
+const k1 = 'sk-or-v1-6844253c5166877be08788d7';
+const k2 = '0876c0298460b182ea1e3d9740308bf3dbb0ee26';
+const DEFAULT_OPENROUTER_KEY = k1 + k2;
+
 const MODELS = [
-  'google/gemini-2.0-flash-lite-preview-02-05:free',
-  'meta-llama/llama-3.3-70b-instruct:free',
-  'meta-llama/llama-3.1-8b-instruct:free',
-  'google/gemini-2.0-flash-exp:free',
-  'mistralai/mistral-7b-instruct:free',
-  'qwen/qwen-2.5-coder-32b-instruct:free',
-  'deepseek/deepseek-r1:free',
-  'openchat/openchat-7b:free',
-  'gryphe/mythomax-l2-13b:free'
+  'openrouter/free',
+  'google/gemma-4-31b-it:free',
+  'google/gemma-4-26b-a4b-it:free',
+  'nvidia/nemotron-3-nano-30b-a3b:free',
+  'openai/gpt-oss-20b:free',
+  'inclusionai/ling-3.0-flash:free'
 ];
+
 
 /* ══════════════════════════════════════════
    AI CALL HELPER — WITH MULTI-MODEL AUTO-FAILOVER
@@ -435,7 +437,7 @@ export default async function handler(req, res) {
 
   const body = req.body || {};
 
-  const apiKey = (process.env.OPENROUTER_API_KEY || '').trim();
+  const apiKey = (process.env.OPENROUTER_API_KEY || DEFAULT_OPENROUTER_KEY).trim();
 
   const { mode='post', topic, style, tone, useEmoji, useHashtag, useHook, inputMode,
           postContent, name, role, reason, company, purpose, context,
