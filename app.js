@@ -1110,30 +1110,29 @@ function renderResult(post) {
 }
 
 /* ── SMART LINKEDIN SHARE (MOBILE + DESKTOP) ── */
-function shareOnLinkedIn() {
+async function shareOnLinkedIn() {
   if (!S.post) {
     toast('⚠️ No post generated to share','err');
     return;
   }
 
-  // 1. Copy text to clipboard synchronously
+  // 1. Copy post text to clipboard
   try {
-    navigator.clipboard.writeText(S.post);
-  } catch(e) {}
+    await navigator.clipboard.writeText(S.post);
+    toast('📋 Post copied! In LinkedIn app: tap (+) -> Paste','ok');
+  } catch(e) {
+    toast('📋 Opening LinkedIn...','ok');
+  }
 
   const text = encodeURIComponent(S.post);
   const shareUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${text}`;
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-  toast('🚀 Opening LinkedIn...','ok');
-
-  // 2. Open LinkedIn share endpoint synchronously without setTimeout so mobile gesture is preserved
-  if (isMobile) {
-    window.location.href = shareUrl;
-  } else {
+  // 2. Open LinkedIn
+  setTimeout(() => {
     window.open(shareUrl, '_blank', 'noopener,noreferrer');
-  }
+  }, 300);
 }
+
 
 
 
