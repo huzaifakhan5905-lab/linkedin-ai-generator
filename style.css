@@ -244,7 +244,7 @@ body {
 .gen-wrap {
   display: grid; grid-template-columns: 400px 1fr; gap: 28px; align-items: start;
 }
-@media(max-width:860px){ .gen-wrap { grid-template-columns: 1fr; } }
+@media(max-width:960px){ .gen-wrap { grid-template-columns: 1fr; } }
 
 /* LEFT */
 .gen-left { display: flex; flex-direction: column; gap: 18px; }
@@ -627,31 +627,54 @@ body {
 .footer p { font-size: .74rem; color: var(--t3); }
 
 /* ══ RESPONSIVE ═══════════════════════════════════ */
+@media(max-width:960px) {
+  .gen-left { width: 100%; }
+  .gen-right { min-height: 300px; }
+}
 @media(max-width:680px) {
   .header__nav { display: none; }
   .header__right { gap: 6px; }
-  .history-btn span:first-child { display: none; }
+  .history-btn > span:first-child { display: none; }
   .hero { padding: 60px 0 48px; }
-  .hero__stats { gap: 14px; }
+  .hero__stats { gap: 14px; flex-wrap: wrap; justify-content: center; }
   .chips { grid-template-columns: repeat(2,1fr); }
   .toggles { gap: 12px; }
-  .plans { grid-template-columns: 1fr; }
+  .plans { grid-template-columns: 1fr !important; }
   .modal-plans { grid-template-columns: 1fr; }
+  /* generator */
+  .gen-wrap { grid-template-columns: 1fr; gap: 16px; }
+  .gen-left { width: 100%; box-sizing: border-box; }
+  .gen-right { min-height: 260px; }
   .gen-btns { flex-direction: column; }
   .btn--variations { width: 100%; }
-  .tool-inner { flex-direction: column; }
-  .tool-left, .tool-right { width: 100%; }
-  .tools-tabs { overflow-x: auto; flex-wrap: nowrap; }
-  .tool-tab { white-space: nowrap; }
+  .result-actions { flex-wrap: wrap; gap: 6px; }
+  .result-actions .btn { flex: 1 1 calc(50% - 6px); justify-content: center; font-size: .78rem; }
+  /* tools */
+  .ai-tools-section { padding: 48px 0; }
+  .tools-tabs {
+    width: 100%; overflow-x: auto; flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch; padding: 5px;
+  }
+  .tool-tab { white-space: nowrap; font-size: .78rem; padding: 8px 13px; }
+  .tool-inner { flex-direction: column; gap: 16px; }
+  .tool-left { width: 100%; box-sizing: border-box; flex-shrink: 1; padding: 20px; }
+  .tool-right { width: 100%; }
   .results-grid { grid-template-columns: 1fr; }
-  .variation-card { min-width: 100%; }
-  .variations-container { flex-direction: column; }
+  /* variations */
+  .variation-card { min-width: 85vw; }
+  .variations-container { flex-direction: row; }
+  /* modals */
+  .modal { padding: 24px 16px; max-height: 90vh; overflow-y: auto; }
+  .modal__h3 { font-size: 1.1rem; }
+  /* templates */
+  .templates-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
 }
 @media(max-width:440px) {
   .hero__stats { flex-direction: column; }
   .divider-v { display: none; }
-  .result-actions { flex-wrap: wrap; }
-  .modal { padding: 24px 16px; }
+  .templates-grid { grid-template-columns: 1fr; }
+  .result-actions .btn { flex: 1 1 100%; }
+  .header__right .credits-pill { display: none; }
 }
 
 /* ══ GEN BUTTONS ROW ══════════════════════════════ */
