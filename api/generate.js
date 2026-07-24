@@ -310,64 +310,114 @@ function buildRepurposePrompt({ content, sourceType }) {
 /* ══════════════════════════════════════════
    INTELLIGENT FALLBACK GENERATOR (0% FAILURE RATE)
 ══════════════════════════════════════════ */
-function generateFallbackPost({ topic, style, tone, lang, length, cta, useEmoji, useHashtag, useHook, urlMeta }) {
-  let cleanTopic = (topic || 'growth and success').trim();
-  
+function generateFallbackPost({ topic, style='storytelling', tone='casual', lang='english', length='medium', cta='question', useEmoji=true, useHashtag=true, useHook=true, urlMeta }) {
+  let raw = (topic || 'career growth and lessons').trim();
+
+  // If topic is URL, use urlMeta title or clean phrase
   if (urlMeta && urlMeta.title) {
-    cleanTopic = urlMeta.title;
-  } else if (/^https?:\/\//i.test(cleanTopic)) {
-    cleanTopic = 'this featured content';
+    raw = urlMeta.title;
+  } else if (/^https?:\/\//i.test(raw)) {
+    raw = 'career growth and valuable lessons';
   }
 
+  // 1. DYNAMIC HOOK GENERATION (Never wrap input sentence in quotes!)
   let hook = '';
-  if (useHook !== false) {
+  if (raw.length > 22 && !raw.endsWith('?')) {
+    hook = raw.charAt(0).toUpperCase() + raw.slice(1);
+    if (!/[.!:]$/.test(hook)) hook += '.';
+  } else {
+    const topicNoun = raw.replace(/^how to |^why |^the /i, '');
     const hooks = [
-      `Most professionals get "${cleanTopic}" completely wrong. Here's why:`,
-      `I spent years analyzing ${cleanTopic}. Here are 4 core lessons nobody tells you:`,
-      `Unpopular opinion on ${cleanTopic}: working harder is not the answer.`,
-      `If you want to master ${cleanTopic}, stop making this 1 common mistake:`,
-      `Here is the exact framework I use for ${cleanTopic}:`
+      `Most people get ${topicNoun} completely wrong.`,
+      `I spent years analyzing ${topicNoun}. Here is what nobody tells you:`,
+      `Unpopular opinion: the standard advice on ${topicNoun} is broken.`,
+      `If you want to master ${topicNoun}, stop making this 1 common mistake:`,
+      `Here is the exact framework I use for ${topicNoun}:`
     ];
     hook = hooks[Math.floor(Math.random() * hooks.length)];
-  } else {
-    hook = `Key insights on ${cleanTopic}:`;
   }
 
+  // Add style prefix if requested
+  if (useHook && !hook.startsWith('⚡') && !hook.startsWith('🔥')) {
+    if (style === 'justin_welsh') {
+      hook = `${hook}\n\nHere's the 1-page system:`;
+    } else if (style === 'ruben_hassid') {
+      hook = `🔥 ${hook}\n\n(And why 90% of people ignore it)`;
+    } else if (style === 'sahil_bloom') {
+      hook = `🧠 ${hook}\n\nA breakdown of the core principles:`;
+    }
+  }
 
+  // 2. DYNAMIC BODY GENERATION BASED ON STYLE & TONE
   let body = '';
-  if (length === 'short') {
-    body = `1. Focus on consistency over intensity.\n2. Measure real outcomes, not just effort.\n3. Build systems that scale effortlessly.\n\nKeep it simple and execute daily.`;
-  } else if (length === 'detailed') {
-    body = `When I first started focusing on ${cleanTopic}, I thought success was about putting in more hours.\n\nI was wrong.\n\nHere are 4 principles that make a real difference:\n\n1. Strategy First\nSpend 80% of your time clarifying your objective before executing.\n\n2. Automate & Delegate\nEliminate repetitive tasks to focus on high-leverage work.\n\n3. High-Value Network\nSurround yourself with people who elevate your standards.\n\n4. Continuous Adaptation\nTest small, learn fast, and iterate relentlessly.`;
+  
+  if (style === 'justin_welsh') {
+    body = `1. Simplify your process.\n\n2. Focus on 1 core leverage point.\n\n3. Automate repetitive tasks.\n\n4. Measure input, not just output.\n\nSystems > Goals. Every single time.`;
+  } else if (style === 'sahil_bloom') {
+    body = `Here are 4 mental models to remember:\n\n• The 80/20 Rule: 20% of effort drives 80% of results.\n• The Compound Effect: Small daily habits compound into massive long-term growth.\n• Inversion Thinking: Instead of asking how to succeed, ask what causes failure.\n• Second-Order Thinking: Consider the long-term consequences of every decision.`;
+  } else if (style === 'listicle') {
+    body = `1. Consistency beats intensity\nDaily execution always wins over occasional bursts of energy.\n\n2. Feedback is free data\nDon't fear mistakes—treat every outcome as valuable feedback.\n\n3. Build scalable systems\nDesign your workflow so progress becomes automatic.\n\n4. Focus on high-leverage activities\nEliminate low-value tasks that drain your time and energy.`;
+  } else if (style === 'insight' || style === 'ruben_hassid') {
+    body = `Here is what most people don't realize:\n\nSuccess isn't about working 80-hour weeks.\nIt's about making better decisions.\n\nWhen you focus on clarity over busyness:\n→ Your output doubles\n→ Your stress drops\n→ Your results compound`;
   } else {
-    body = `1. Prioritize impact over busywork.\n2. Build a repeatable system, not just a one-time goal.\n3. Track your key metrics weekly.\n4. Treat every mistake as actionable data.\n\nThe real secret is simply showing up with clarity and discipline.`;
+    // Default Storytelling
+    body = `When I first faced this challenge, I thought more effort was the answer.\n\nI was wrong.\n\nAfter stepping back and analyzing what actually works, I realized 3 key lessons:\n\n1. Prioritize clarity over busyness\n2. Focus on continuous improvement\n3. Protect your time fiercely\n\nOnce I made this shift, everything changed.`;
   }
 
+  // Length adjustments
+  if (length === 'short') {
+    body = `1. Prioritize clarity over busyness.\n2. Focus on scalable daily habits.\n3. Measure inputs, not just outcomes.\n\nKeep it simple and execute daily.`;
+  } else if (length === 'detailed') {
+    body += `\n\nDeep Dive:\nThe reason most people get stuck is that they confuse activity with accomplishment. True progress happens when you align daily execution with long-term strategy.\n\nTakeaway: Stop optimizing for busyness. Start optimizing for leverage.`;
+  }
+
+  // 3. CTA SELECTION
   let ctaText = '';
   if (cta === 'question') {
-    ctaText = `What is your #1 takeaway on ${cleanTopic}? Share your thoughts below! 👇`;
+    ctaText = `What's your biggest takeaway from this? Let's discuss in the comments below! 👇`;
   } else if (cta === 'comment') {
-    ctaText = `Comment "GUIDE" below and I'll send you my complete framework! 📩`;
+    ctaText = `Comment "GUIDE" below and I'll send you my complete breakdown PDF! 📩`;
   } else if (cta === 'repost') {
-    ctaText = `♻️ Repost this to share these insights with your network!`;
+    ctaText = `♻️ Repost this if you found it valuable—it might help someone in your network!`;
   } else if (cta === 'dm') {
-    ctaText = `Send me a DM if you're working on ${cleanTopic} and want to collaborate! 💬`;
+    ctaText = `Send me a DM if you're working on this and want to exchange insights! 💬`;
   } else {
-    ctaText = `Follow for more practical insights on career & business growth! 🚀`;
+    ctaText = `Follow for more practical strategies on career growth & personal branding! 🚀`;
   }
 
-  const hashtags = useHashtag !== false ? '\n\n#Leadership #Growth #CareerAdvice #Success #LinkedIn' : '';
+  // 4. LANGUAGE TRANSLATION & CONVERSION
+  let fullPost = `${hook}\n\n${body}\n\n${ctaText}`;
 
-  let fullPost = `${hook}\n\n${body}\n\n${ctaText}${hashtags}`;
-  
   if (lang === 'hinglish') {
-    fullPost = `${hook}\n\nBahut log ${cleanTopic} ko lekar yeh mistake karte hain. Agar aapko real growth chahiye, toh yeh 3 baatein hamesha yaad rahein:\n\n1. Consistency sabse pehle hai.\n2. Strategy ke bina hard work waste hai.\n3. Har hafte apni progress track karein.\n\n${ctaText}${hashtags}`;
+    if (raw.length > 22 && !raw.endsWith('?')) {
+      hook = raw;
+    } else {
+      hook = `Agar aap ${raw} me grow karna chahte hain, toh yeh 3 baatein hamesha yaad rakhein:`;
+    }
+    body = `1. Consistency sabse pehle hai\nDaily effort se hi real long-term results milte hain.\n\n2. High-Leverage Tasks par focus karein\nSirf busy rehne se success nahi milti, sahi Direction me kaam karne se milti hai.\n\n3. Har mistake se seekhein\nFailure koi end-point nahi hai, yeh bas ek feedback hai.`;
+    fullPost = `${hook}\n\n${body}\n\n${ctaText}`;
   } else if (lang === 'hindi') {
-    fullPost = `${hook}\n\n${cleanTopic} के संदर्भ में सबसे महत्वपूर्ण बात:\n\n1. निरंतरता सबसे महत्वपूर्ण कुंजी है।\n2. सही रणनीति के बिना मेहनत व्यर्थ है।\n3. हर सप्ताह अपनी प्रगति का आकलन करें।\n\n${ctaText}${hashtags}`;
+    if (raw.length > 22 && !raw.endsWith('?')) {
+      hook = raw;
+    } else {
+      hook = `${raw} के संदर्भ में सबसे महत्वपूर्ण बात:`;
+    }
+    body = `1. निरंतरता सबसे महत्वपूर्ण कुंजी है\nदैनिक प्रयास से ही दीर्घकालिक परिणाम मिलते हैं।\n\n2. सही दिशा में प्रयास करें\nकेवल व्यस्त रहना सफलता नहीं है, सही दिशा में काम करना जरूरी है।\n\n3. अपनी गलतियों से सीखें\nअसफलता अंतिम चरण नहीं है, बल्कि यह सीखने का अवसर है।`;
+    fullPost = `${hook}\n\n${body}\n\n${ctaText}`;
   }
 
-  return fullPost;
+  // Emojis & Hashtags
+  if (!useEmoji) {
+    fullPost = fullPost.replace(/[\u{1F300}-\u{1F9FF}]/gu, '');
+  }
+
+  if (useHashtag) {
+    fullPost += '\n\n#CareerGrowth #Leadership #Productivity #PersonalBrand #LinkedIn';
+  }
+
+  return fullPost.trim();
 }
+
 
 /* ══════════════════════════════════════════
    MAIN HANDLER
