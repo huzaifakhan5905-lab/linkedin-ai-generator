@@ -126,18 +126,41 @@ function extractYouTubeId(url) {
 }
 
 async function fetchYouTubeContent(videoId) {
+  // Attempt 1: YouTube oEmbed API
   try {
     const ctrl = new AbortController();
     setTimeout(() => ctrl.abort(), 6000);
     const res = await fetch(
       `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`,
-      { signal: ctrl.signal }
+      { signal: ctrl.signal, headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' } }
     );
-    if (!res.ok) return null;
-    const d = await res.json();
-    return { type: 'youtube', title: d.title || '', channel: d.author_name || '' };
-  } catch { return null; }
+    if (res.ok) {
+      const d = await res.json();
+      if (d.title) return { type: 'youtube', title: d.title, channel: d.author_name || 'YouTube Creator' };
+    }
+  } catch {}
+
+  // Attempt 2: Direct YouTube HTML title scrape
+  try {
+    const ctrl = new AbortController();
+    setTimeout(() => ctrl.abort(), 6000);
+    const res = await fetch(`https://www.youtube.com/watch?v=${videoId}`, {
+      signal: ctrl.signal,
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
+    });
+    if (res.ok) {
+      const html = await res.text();
+      const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
+      if (titleMatch && titleMatch[1]) {
+        const cleanTitle = titleMatch[1].replace(/- YouTube$/i, '').trim();
+        return { type: 'youtube', title: cleanTitle, channel: 'YouTube Creator' };
+      }
+    }
+  } catch {}
+
+  return null;
 }
+
 
 async function fetchWebContent(url) {
   try {
@@ -287,9 +310,15 @@ function buildRepurposePrompt({ content, sourceType }) {
 /* ══════════════════════════════════════════
    INTELLIGENT FALLBACK GENERATOR (0% FAILURE RATE)
 ══════════════════════════════════════════ */
-function generateFallbackPost({ topic, style, tone, lang, length, cta, useEmoji, useHashtag, useHook }) {
-  const cleanTopic = (topic || 'growth and success').trim();
+function generateFallbackPost({ topic, style, tone, lang, length, cta, useEmoji, useHashtag, useHook, urlMeta }) {
+  let cleanTopic = (topic || 'growth and success').trim();
   
+  if (urlMeta && urlMeta.title) {
+    cleanTopic = urlMeta.title;
+  } else if (/^https?:\/\//i.test(cleanTopic)) {
+    cleanTopic = 'this featured content';
+  }
+
   let hook = '';
   if (useHook !== false) {
     const hooks = [
@@ -303,6 +332,7 @@ function generateFallbackPost({ topic, style, tone, lang, length, cta, useEmoji,
   } else {
     hook = `Key insights on ${cleanTopic}:`;
   }
+
 
   let body = '';
   if (length === 'short') {
@@ -474,9 +504,10 @@ export default async function handler(req, res) {
   } catch (err) {
     console.error('Handler error:', err.message);
     if (mode === 'post' || mode === 'variations') {
-      const fallback = generateFallbackPost(body);
+      const fallback = generateFallbackPost({ ...body, urlMeta });
       return res.status(200).json({ success: true, post: fallback, result: fallback, modelUsed: 'smart-fallback', urlType: null, urlFetchFailed: false });
     }
+
     return res.status(200).json({ success: true, result: 'Action completed with smart default results.', error: null });
   }
 }
