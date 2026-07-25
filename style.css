@@ -1193,11 +1193,54 @@ body {
 .mobile-sticky-bar {
   position: fixed; bottom: 12px; left: 12px; right: 12px; z-index: 1500;
   background: rgba(15,17,30,0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  border: 1px solid var(--blue); border-radius: var(--r-lg);
-  padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.6); animation: fadein .2s ease;
+/* ── VIRAL UNLOCK BANNER & HOOK CARDS ── */
+.viral-hooks-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px; flex-wrap: wrap; gap: 10px;
 }
-#mobileBarStatus { font-size: .8rem; font-weight: 700; color: var(--green); }
+.unlock-badge {
+  font-family: 'Syne', sans-serif; font-size: .8rem; font-weight: 700;
+  padding: 5px 14px; border-radius: var(--r-full);
+  background: rgba(245,166,35,0.15); border: 1px solid var(--amber); color: var(--amber);
+}
+.unlock-badge--unlocked {
+  background: rgba(48,209,88,0.15); border-color: var(--green); color: var(--green);
+}
+.viral-unlock-banner {
+  background: linear-gradient(135deg, rgba(10,132,255,0.12), rgba(94,92,230,0.12));
+  border: 1px solid var(--blue); border-radius: var(--r-xl);
+  padding: 20px 24px; display: flex; align-items: center; gap: 20px;
+  margin-bottom: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.viral-unlock-banner .banner-icon { font-size: 2.4rem; }
+.viral-unlock-banner h4 {
+  font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700;
+  color: var(--t1); margin-bottom: 6px;
+}
+.viral-unlock-banner p { font-size: .86rem; color: var(--t2); margin-bottom: 14px; line-height: 1.5; }
+.share-actions-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn--wa {
+  background: #25D366; color: #fff; border: none; font-weight: 700;
+}
+.btn--wa:hover { background: #20bd5a; transform: translateY(-1px); }
+
+.viral-hooks-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px;
+}
+.hook-card {
+  background: var(--s1); border: 1px solid var(--border2);
+  border-radius: var(--r-lg); padding: 16px; display: flex; flex-direction: column;
+  justify-content: space-between; gap: 12px; transition: all .18s var(--ease);
+}
+.hook-card:hover { border-color: var(--blue); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+.hook-card__cat {
+  font-family: 'Syne', sans-serif; font-size: .68rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .08em; color: var(--purple);
+}
+.hook-card__text { font-size: .88rem; color: var(--t1); line-height: 1.5; font-weight: 500; }
+.hook-card__actions { display: flex; align-items: center; justify-content: space-between; }
+.hook-card--locked { filter: blur(3px); opacity: 0.5; pointer-events: none; }
+
 
 
 

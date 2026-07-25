@@ -130,7 +130,9 @@ document.addEventListener('DOMContentLoaded', () => {
   updateHistoryBadge();
   checkOnboarding();  // Gap #5: Onboarding
   handleHashNav();    // Gap #7: Hash Navigation
+  renderViralHooks(); // Feature: 50+ Viral Hooks
 });
+
 
 window.addEventListener('hashchange', handleHashNav);
 
@@ -484,8 +486,193 @@ function copyPoll(idx) {
 }
 
 /* ══════════════════════════════════════════
+   FEATURE 0A: INSTANT PROFILE AUDITOR & SCORE
+══════════════════════════════════════════ */
+async function auditProfile() {
+  const role = document.getElementById('auditRole')?.value?.trim();
+  const bio = document.getElementById('auditBio')?.value?.trim() || '';
+  if (!role) { toast('⚠️ Please enter your current headline or role', 'err'); return; }
+
+  setBusy(true, 'auditBtn', 'auditBtnText', null, 'auditSpinner', 'Auditing profile...');
+  try {
+    const data = await callAPI({ mode: 'headline', currentRole: role, experience: bio, skills: 'LinkedIn Personal Brand' });
+    renderAudit(role, bio, data.result);
+    toast('✓ Profile audit complete!', 'ok');
+  } catch (e) {
+    toast(`⚠️ ${e.message || 'Audit failed'}`, 'err');
+  } finally {
+    setBusy(false, 'auditBtn', 'auditBtnText', null, 'auditSpinner', '🎯 Calculate My Profile Score');
+  }
+}
+
+function renderAudit(role, bio, aiResult) {
+  const len = role.length;
+  const hasKeywords = /founder|engineer|manager|growth|lead|scale|help|arr|roi|architect|creator|consultant/i.test(role);
+  const hasValueProp = /help|scale|build|grow|drive|increase|transform|deliver/i.test(role);
+  const hasDivider = /[|•\-–\/]/.test(role);
+
+  let score = 58;
+  if (len >= 35 && len <= 200) score += 15;
+  if (hasKeywords) score += 12;
+  if (hasValueProp) score += 10;
+  if (hasDivider) score += 5;
+  score = Math.min(score, 98);
+
+  const headlines = (aiResult || '').split(/---HEADLINE \d+---/).map(s => s.trim()).filter(Boolean);
+
+  const out = document.getElementById('auditResults'); if (!out) return;
+  out.innerHTML = `
+    <div class="result-card" style="border-color:var(--blue)">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:${score>=80?'var(--green)':score>=60?'var(--amber)':'var(--red)'}">${score}/100</div>
+          <div style="font-size:.78rem;font-weight:700;color:var(--t2)">LINKEDIN PROFILE SCORE</div>
+        </div>
+        <div class="char-badge ${score>=80?'':'char-badge--over'}">${score>=80?'🔥 High Performing':score>=60?'⚡ Good Quality':'⚠️ Needs Optimization'}</div>
+      </div>
+      
+      <div style="font-size:.84rem;color:var(--t1);line-height:1.55;margin-top:10px">
+        <strong>📌 Optimization Tips:</strong>
+        <ul style="padding-left:18px;margin-top:6px">
+          ${!hasValueProp ? '<li>Add a clear value statement (e.g. "Helping X achieve Y").</li>' : ''}
+          ${!hasDivider ? '<li>Use dividers ( | or • ) to separate role from outcome.</li>' : ''}
+          ${len < 30 ? '<li>Length is short. Add search keywords to increase visibility.</li>' : ''}
+          <li>Current character count: ${len}/220.</li>
+        </ul>
+      </div>
+
+      <div style="margin-top:12px">
+        <strong>✨ AI Rewritten Headlines:</strong>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+          ${headlines.slice(0, 3).map((h, i) => `
+            <div style="background:var(--s2);padding:10px 12px;border-radius:var(--r-md);font-size:.84rem;color:var(--t1);display:flex;align-items:center;justify-content:space-between;gap:8px">
+              <span>${esc(h)}</span>
+              <button class="btn btn--ghost btn--sm" onclick="copyTextDirect('${esc(h).replace(/'/g, "\\'")}')">📋 Copy</button>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <button class="btn btn--li btn--full" style="margin-top:14px" onclick="shareAuditScore(${score})">📢 Share Score Badge on LinkedIn ↗</button>
+    </div>
+  `;
+  out.style.display = 'block';
+  document.getElementById('auditEmpty').style.display = 'none';
+}
+
+function shareAuditScore(score) {
+  const text = `I just audited my LinkedIn profile on PostCraft AI and scored ${score}/100! 🎯\n\nWant to know your LinkedIn profile score for free? Test it here:\nhttps://linkedin-ai-generator-seven.vercel.app/`;
+  navigator.clipboard.writeText(text).then(() => {
+    toast('✓ Score badge copied! Opening LinkedIn...', 'ok');
+    setTimeout(() => {
+      window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent('https://linkedin-ai-generator-seven.vercel.app/'), '_blank');
+    }, 600);
+  });
+}
+
+function copyTextDirect(str) {
+  navigator.clipboard.writeText(str).then(() => toast('✓ Copied to clipboard!', 'ok'));
+}
+
+/* ══════════════════════════════════════════
+   FEATURE 0B: SECRET 50+ VIRAL HOOKS (VIRAL SHARE UNLOCK)
+══════════════════════════════════════════ */
+const VIRAL_HOOKS_DATA = [
+  { cat: 'Storytelling', hook: 'I failed very publicly at something I was confident about. Here is what happened:' },
+  { cat: 'Storytelling', hook: '3 years ago, I had zero followers and $0 revenue. Today, everything changed. 4 rules I followed:' },
+  { cat: 'Storytelling', hook: 'The hardest lesson I learned in my 20s (that saved my career in my 30s):' },
+  { cat: 'Storytelling', hook: 'I almost quit last year. Here is the 1 conversation that turned everything around:' },
+  { cat: 'Storytelling', hook: 'Behind every "overnight success" is 5 years of silent, unglamorous execution. My story:' },
+  { cat: 'Contrarian', hook: 'Unpopular opinion: Working 80 hours a week is not a badge of honor. It is poor leverage.' },
+  { cat: 'Contrarian', hook: 'Most advice about career growth is completely backwards. Stop doing these 3 things:' },
+  { cat: 'Contrarian', hook: 'Why 90% of people fail at personal branding (and the 1 shift that fixes it):' },
+  { cat: 'Contrarian', hook: 'Stop focusing on goals. Focus on non-negotiable daily systems instead.' },
+  { cat: 'Contrarian', hook: 'You do not need more time. You need better decision clarity.' },
+  { cat: 'Listicle', hook: '7 free AI tools that will save you 20+ hours of work every single week:' },
+  { cat: 'Listicle', hook: '5 subtle habits of ultra-high performers that nobody talks about:' },
+  { cat: 'Listicle', hook: 'The 4-step framework I use to write high-converting LinkedIn posts in 10 minutes:' },
+  { cat: 'Listicle', hook: '6 books that taught me more about business than a 4-year degree:' },
+  { cat: 'Listicle', hook: '8 simple ChatGPT prompts that will supercharge your daily workflow:' },
+  { cat: 'Breakthrough', hook: 'How I scaled my daily output without burning out (my 3-part productivity stack):' },
+  { cat: 'Breakthrough', hook: 'The 1 mental model that completely transformed how I handle tough decisions:' },
+  { cat: 'Breakthrough', hook: 'If I had to restart my career from scratch today, here is my exact 30-day playbook:' },
+  { cat: 'Breakthrough', hook: 'How to build authority in your niche even if you feel like an imposter:' },
+  { cat: 'Breakthrough', hook: 'The secret to consistent growth isn’t talent. It’s relentless iteration.' },
+  { cat: 'Systems', hook: 'My 1-page system for organizing projects, tasks, and daily priority goals:' },
+  { cat: 'Systems', hook: 'The 80/20 breakdown of personal branding: 20% creation, 80% distribution.' },
+  { cat: 'Systems', hook: 'How to automate 90% of your repetitive weekly tasks using simple workflows:' },
+  { cat: 'Systems', hook: 'The exact framework I use to negotiate high-value deals and retain clients:' },
+  { cat: 'Systems', hook: '3 high-leverage habits that pay compound interest for years:' }
+];
+
+function isHooksUnlocked() {
+  return localStorage.getItem('postcraft_hooks_unlocked') === '1';
+}
+
+function renderViralHooks() {
+  const container = document.getElementById('viralHooksGrid');
+  const banner = document.getElementById('viralUnlockBanner');
+  const badge = document.getElementById('unlockBadge');
+  if (!container) return;
+
+  const unlocked = isHooksUnlocked();
+
+  if (badge) {
+    badge.textContent = unlocked ? '🔓 Unlocked (50/50)' : '🔒 Locked (0/50)';
+    badge.className = unlocked ? 'unlock-badge unlock-badge--unlocked' : 'unlock-badge';
+  }
+
+  if (banner) {
+    banner.style.display = unlocked ? 'none' : 'flex';
+  }
+
+  container.innerHTML = VIRAL_HOOKS_DATA.map((item, idx) => {
+    const isLocked = !unlocked && idx >= 3;
+    return `
+      <div class="hook-card ${isLocked ? 'hook-card--locked' : ''}">
+        <div>
+          <div class="hook-card__cat">${item.cat}</div>
+          <div class="hook-card__text">"${esc(item.hook)}"</div>
+        </div>
+        <div class="hook-card__actions">
+          <button class="btn btn--ghost btn--sm" onclick="useHookTemplate('${esc(item.hook).replace(/'/g, "\\'")}')">⚡ Use Hook</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function shareToUnlock(platform) {
+  const url = 'https://linkedin-ai-generator-seven.vercel.app/';
+  const text = 'Check out PostCraft AI — 100% Free AI LinkedIn Post & Carousel Generator! 🚀';
+  
+  if (platform === 'wa') {
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text + '\n' + url)}`, '_blank');
+  } else {
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
+  }
+
+  localStorage.setItem('postcraft_hooks_unlocked', '1');
+  toast('🎉 50+ Secret Viral Hooks Unlocked Forever!', 'ok');
+  setTimeout(() => renderViralHooks(), 300);
+}
+
+function useHookTemplate(hookText) {
+  switchInputMode('topic');
+  const input = document.getElementById('topicInput');
+  if (input) {
+    input.value = hookText;
+    const cc = document.getElementById('charCount');
+    if (cc) cc.textContent = `${hookText.length} / 500`;
+  }
+  document.getElementById('generator')?.scrollIntoView({ behavior: 'smooth' });
+  toast('✓ Hook applied to generator!', 'ok');
+}
+
+/* ══════════════════════════════════════════
    FEATURE 1: HEADLINE GENERATOR
 ══════════════════════════════════════════ */
+
 async function generateHeadlines() {
   const name        = document.getElementById('hlName')?.value?.trim()||'';
   const currentRole = document.getElementById('hlRole')?.value?.trim();

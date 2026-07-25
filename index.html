@@ -354,7 +354,9 @@
     <h2 class="section-h2">Supercharge Your LinkedIn Profile &amp; Reach</h2>
     
     <div class="tools-tabs">
-      <button class="tool-tab tool-tab--active" onclick="switchTool('headline')">✨ Headline Generator</button>
+      <button class="tool-tab tool-tab--active" onclick="switchTool('audit')">🎯 Profile Auditor &amp; Score</button>
+      <button class="tool-tab" onclick="switchTool('viral-hooks')">🎁 50+ Secret Hooks (Share to Unlock)</button>
+      <button class="tool-tab" onclick="switchTool('headline')">✨ Headline Generator</button>
       <button class="tool-tab" onclick="switchTool('about')">✍️ About Section</button>
       <button class="tool-tab" onclick="switchTool('dm')">✉️ DM Templates</button>
       <button class="tool-tab" onclick="switchTool('repurpose')">🔄 Content Repurposer</button>
@@ -368,11 +370,70 @@
       <button class="tool-tab" onclick="switchTool('polls')">📊 Poll Maker</button>
     </div>
 
+
     <!-- PANELS -->
     <div class="tools-container">
 
+      <!-- TOOL 0A: LINKEDIN PROFILE AUDITOR & SCORE -->
+      <div id="tool-audit" class="tool-panel tool-panel--active">
+        <div class="tool-inner">
+          <div class="tool-left">
+            <h3>🎯 Instant LinkedIn Profile &amp; Headline Auditor</h3>
+            <p>Get a instant 0-100 LinkedIn Optimization Score + AI recommendations &amp; 3 rewritten headlines.</p>
+            <div class="field-grp">
+              <label class="lbl">Current Headline / Role *</label>
+              <input id="auditRole" class="inp" placeholder="e.g. Founder at TechCo | Helping SaaS teams scale ARR" />
+            </div>
+            <div class="field-grp">
+              <label class="lbl">About / Summary Snippet (Optional)</label>
+              <textarea id="auditBio" class="ta" rows="3" placeholder="Paste a snippet of your About section for complete audit..."></textarea>
+            </div>
+            <button id="auditBtn" class="btn btn--primary btn--full" onclick="auditProfile()">
+              <span id="auditBtnText">🎯 Calculate My Profile Score</span>
+              <span id="auditSpinner" class="spinner" style="display:none"></span>
+            </button>
+          </div>
+          <div class="tool-right">
+            <div id="auditEmpty" class="tool-empty">Enter your headline and click Calculate to view your LinkedIn Profile Score!</div>
+            <div id="auditResults" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOL 0B: SECRET 50+ VIRAL HOOKS (SHARE TO UNLOCK) -->
+      <div id="tool-viral-hooks" class="tool-panel">
+        <div class="tool-inner">
+          <div class="tool-left" style="max-width:100%;grid-column:span 2">
+            <div class="viral-hooks-hdr">
+              <div>
+                <h3>🎁 Secret 50+ Top 1% LinkedIn Viral Hooks</h3>
+                <p>Unlock proven high-converting scroll-stopping opening lines used by top creators.</p>
+              </div>
+              <div id="unlockBadge" class="unlock-badge">🔒 Locked (0/50)</div>
+            </div>
+
+            <!-- UNLOCK BANNER -->
+            <div id="viralUnlockBanner" class="viral-unlock-banner">
+              <div class="banner-icon">🔒</div>
+              <div class="banner-content">
+                <h4>Unlock 50+ Top 1% Viral Hooks &amp; Frameworks Free!</h4>
+                <p>Share PostCraft AI on WhatsApp or LinkedIn to instantly unlock all 50+ secret viral hooks forever.</p>
+                <div class="share-actions-row">
+                  <button class="btn btn--wa" onclick="shareToUnlock('wa')">📱 Share on WhatsApp to Unlock</button>
+                  <button class="btn btn--li" onclick="shareToUnlock('li')">💼 Share on LinkedIn to Unlock</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- HOOKS GRID CONTAINER -->
+            <div id="viralHooksGrid" class="viral-hooks-grid"></div>
+          </div>
+        </div>
+      </div>
+
       <!-- TOOL 1: HEADLINE GENERATOR -->
-      <div id="tool-headline" class="tool-panel tool-panel--active">
+      <div id="tool-headline" class="tool-panel">
+
         <div class="tool-inner">
           <div class="tool-left">
             <h3>✨ LinkedIn Profile Headline Generator</h3>
