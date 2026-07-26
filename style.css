@@ -911,8 +911,8 @@ body {
 .tools-tabs {
   display: flex; gap: 8px; margin-bottom: 28px;
   background: var(--s1); border: 1px solid var(--border);
-  border-radius: var(--r-lg); padding: 6px;
-  width: fit-content;
+  border-radius: var(--r-lg); padding: 8px;
+  width: 100%; max-width: 100%; flex-wrap: wrap;
 }
 .tool-tab {
   padding: 9px 18px; border: none; background: transparent;
